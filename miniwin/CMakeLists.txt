@@ -65,7 +65,7 @@ target_include_directories(miniwin
 )
 target_link_libraries(miniwin PUBLIC miniwin-headers)
 
-target_link_libraries(miniwin PRIVATE SDL3::SDL3)
+target_link_libraries(miniwin PRIVATE SDL2)
 
 # Shader stuff
 

@@ -51,10 +51,10 @@ message(STATUS "Internal miniwin:       ${ISLE_MINIWIN}")
 message(STATUS "Isle debugging:         ${ISLE_DEBUG}")
 message(STATUS "Compile shaders:        ${ISLE_COMPILE_SHADERS}")
 
+    include(FetchContent)
 if (DOWNLOAD_DEPENDENCIES)
     # FetchContent downloads and configures dependencies
     message(STATUS "Fetching SDL3 and iniparser. This might take a while...")
-    include(FetchContent)
     FetchContent_Declare(
         SDL3
         GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -62,7 +62,12 @@ if (DOWNLOAD_DEPENDENCIES)
         EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(SDL3)
-
+else()
+    # find_package looks for already-installed system packages.
+    # Configure with `-DCMAKE_PREFIX_PATH="/path/to/package1;/path/to/package2"`
+    # to add search paths.
+    find_package(SDL2 CONFIG REQUIRED)
+		
     FetchContent_Declare(
         iniparser
         GIT_REPOSITORY "https://gitlab.com/iniparser/iniparser.git"
@@ -74,16 +79,6 @@ if (DOWNLOAD_DEPENDENCIES)
       set(BUILD_SHARED_LIBS off)
       FetchContent_MakeAvailable(iniparser)
     endblock()
-else()
-    # find_package looks for already-installed system packages.
-    # Configure with `-DCMAKE_PREFIX_PATH="/path/to/package1;/path/to/package2"`
-    # to add search paths.
-    find_package(SDL3 CONFIG REQUIRED)
-
-    find_package(iniparser CONFIG COMPONENTS static)
-    if (NOT TARGET iniparser-static)
-        find_package(iniparser REQUIRED MODULE COMPONENTS static)
-    endif()
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -152,8 +147,7 @@ target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/L
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/sources>")
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include>")
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include/actions>")
-target_link_libraries(lego1 PRIVATE SDL3::SDL3)
-target_link_libraries(lego1 PUBLIC SDL3::Headers)
+target_link_libraries(lego1 PUBLIC SDL2)
 target_link_libraries(lego1 PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5>)
 if(WIN32)
   set_property(TARGET lego1 PROPERTY PREFIX "")
@@ -484,7 +478,7 @@ if (ISLE_BUILD_APP)
   target_link_libraries(isle PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5>)
 
   # Link SDL and iniparser
-  target_link_libraries(isle PRIVATE SDL3::SDL3 iniparser-static)
+  target_link_libraries(isle PRIVATE SDL2 iniparser-static)
 
   # Allow unconditional include of miniwin/miniwindevice.h
   target_link_libraries(isle PRIVATE miniwin-headers)
@@ -547,7 +541,7 @@ if (ISLE_BUILD_CONFIG)
     target_link_libraries(config PRIVATE DirectX5::DirectX5)
   endif()
   target_compile_definitions(config PRIVATE DIRECT3D_VERSION=0x500)
-  target_link_libraries(config PRIVATE SDL3::SDL3 iniparser-static)
+  target_link_libraries(config PRIVATE SDL2 iniparser-static)
   if (NOT ISLE_MINIWIN)
     target_link_libraries(config PRIVATE ddraw dxguid)
   endif()
@@ -610,7 +604,7 @@ endif()
 
 set(install_extra_targets)
 if(DOWNLOAD_DEPENDENCIES)
-  get_property(sdl3_type TARGET SDL3::SDL3 PROPERTY TYPE)
+  get_property(sdl3_type TARGET SDL2 PROPERTY TYPE)
   if(sdl3_type STREQUAL "SHARED_LIBRARY")
     list(APPEND install_extra_targets "SDL3-shared")
   endif()
