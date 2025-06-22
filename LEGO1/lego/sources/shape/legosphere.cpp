@@ -12,7 +12,7 @@ LegoResult LegoSphere::Read(LegoStorage* p_storage)
 	if ((result = m_center.Read(p_storage)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Read(&m_radius, sizeof(LegoFloat))) != SUCCESS) {
+	if ((result = p_storage->ReadFloat(&m_radius)) != SUCCESS) {
 		return result;
 	}
 	return SUCCESS;

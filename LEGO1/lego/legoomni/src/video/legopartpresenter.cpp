@@ -70,20 +70,20 @@ MxResult LegoPartPresenter::Read(MxDSChunk& p_chunk)
 	LegoTextureInfo* textureInfo = NULL;
 	LegoS32 hardwareMode = VideoManager()->GetDirect3D()->AssignedDevice()->GetHardwareMode();
 
-	if (storage.Read(&textureInfoOffset, sizeof(LegoU32)) != SUCCESS) {
+	if (storage.ReadU32(&textureInfoOffset) != SUCCESS) {
 		goto done;
 	}
 	if (storage.SetPosition(textureInfoOffset) != SUCCESS) {
 		goto done;
 	}
-	if (storage.Read(&numTextures, sizeof(LegoU32)) != SUCCESS) {
+	if (storage.ReadU32(&numTextures) != SUCCESS) {
 		goto done;
 	}
 
 	for (i = 0; i < numTextures; i++) {
 		LegoU32 textureNameLength;
 
-		storage.Read(&textureNameLength, sizeof(LegoU32));
+		storage.ReadU32(&textureNameLength);
 		textureName = new LegoChar[textureNameLength + 1];
 		storage.Read(textureName, textureNameLength);
 		textureName[textureNameLength] = '\0';
@@ -147,12 +147,12 @@ MxResult LegoPartPresenter::Read(MxDSChunk& p_chunk)
 
 	m_parts = new LegoNamedPartList();
 
-	if (storage.Read(&numROIs, sizeof(LegoU32)) != SUCCESS) {
+	if (storage.ReadU32(&numROIs) != SUCCESS) {
 		goto done;
 	}
 
 	for (i = 0; i < numROIs; i++) {
-		if (storage.Read(&roiNameLength, sizeof(LegoU32)) != SUCCESS) {
+		if (storage.ReadU32(&roiNameLength) != SUCCESS) {
 			goto done;
 		}
 
@@ -164,10 +164,10 @@ MxResult LegoPartPresenter::Read(MxDSChunk& p_chunk)
 		roiName[roiNameLength] = '\0';
 		SDL_strlwr(roiName);
 
-		if (storage.Read(&numLODs, sizeof(LegoU32)) != SUCCESS) {
+		if (storage.ReadU32(&numLODs) != SUCCESS) {
 			goto done;
 		}
-		if (storage.Read(&roiInfoOffset, sizeof(LegoU32)) != SUCCESS) {
+		if (storage.ReadU32(&roiInfoOffset) != SUCCESS) {
 			goto done;
 		}
 

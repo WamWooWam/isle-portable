@@ -40,7 +40,7 @@ public:
 	bool Tick();
 	void SetupCursor(Cursor p_cursor);
 
-	// static MxU8 MapMouseButtonFlagsToModifier(SDL_MouseButtonFlags p_flags);
+	static MxU8 MapMouseButtonFlagsToModifier(Uint32 p_flags);
 
 	HWND GetWindowHandle() { return m_windowHandle; }
 	MxLong GetFrameDelta() { return m_frameDelta; }

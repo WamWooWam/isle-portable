@@ -209,7 +209,7 @@ MxResult LegoWorldPresenter::LoadWorld(char* p_worldName, LegoWorld* p_world)
 	}
 
 	if (g_wdbSkipGlobalPartsOffset == 0) {
-		if (SDL_ReadIO(wdbFile, &size, sizeof(MxU32)) != sizeof(MxU32)) {
+		if (SDL_ReadU32LE(wdbFile, &size) != SDL_TRUE) {
 			return FAILURE;
 		}
 
@@ -229,7 +229,7 @@ MxResult LegoWorldPresenter::LoadWorld(char* p_worldName, LegoWorld* p_world)
 
 		delete[] buff;
 
-		if (SDL_ReadIO(wdbFile, &size, sizeof(MxU32)) != sizeof(MxU32)) {
+		if (SDL_ReadU32LE(wdbFile, &size) != SDL_TRUE) {
 			return FAILURE;
 		}
 

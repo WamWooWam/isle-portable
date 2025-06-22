@@ -3,7 +3,7 @@
 
 #include "compat.h"
 
-#ifdef _DEBUG
+#if 1
 
 // In debug mode, replace the macro with the function call.
 #define MxTrace _MxTrace

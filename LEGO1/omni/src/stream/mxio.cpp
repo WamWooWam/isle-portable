@@ -72,6 +72,7 @@ MxU16 MXIOINFO::Open(const char* p_filename, MxULong p_flags)
 		}
 	}
 	else {
+		MxTrace("Failed to open %s, SDL error:\n", p_filename, SDL_GetError());
 		result = MMIOERR_CANNOTOPEN;
 	}
 
@@ -100,11 +101,46 @@ MxU16 MXIOINFO::Close(MxLong p_unused)
 	return result;
 }
 
+MxLong MXIOINFO::Read2(void* p_buff, MxLong p_len) {
+	MxLong retVal = Read(p_buff, p_len);
+
+	MxU16* data = (MxU16*)p_buff;
+	for (int i = 0; i < (retVal / 2); i++) {
+		data[i] = SDL_SwapLE16(data[i]);
+	}
+
+	return retVal;
+}
+
+MxLong MXIOINFO::Read4(void* p_buff, MxLong p_len) {
+	MxLong retVal = Read(p_buff, p_len);
+
+	MxU32* data = (MxU32*)p_buff;
+	for (int i = 0; i < (retVal / 4); i++) {
+		data[i] = SDL_SwapLE32(data[i]);
+	}
+
+	return retVal;
+}
+
+MxLong MXIOINFO::Read8(void* p_buff, MxLong p_len) {
+	MxLong retVal = Read(p_buff, p_len);
+
+	MxU64* data = (MxU64*)p_buff;
+	for (int i = 0; i < (retVal / 8); i++) {
+		data[i] = SDL_SwapLE64(data[i]);
+	}
+
+	return retVal;
+}
+
 // FUNCTION: LEGO1 0x100cc930
 // FUNCTION: BETA10 0x1015e3b2
 MxLong MXIOINFO::Read(void* p_buf, MxLong p_len)
 {
 	Sint64 bytesRead = 0;
+
+	printf("MXIOINFO::Read %d bytes at %d\n", p_len, m_info.lDiskOffset);
 
 	if (m_info.pchBuffer) {
 
@@ -471,7 +507,7 @@ MxU16 MXIOINFO::Descend(ISLE_MMCKINFO* p_chunkInfo, const ISLE_MMCKINFO* p_paren
 
 	if (!p_descend) {
 		p_chunkInfo->dwFlags = 0;
-		if (Read(p_chunkInfo, 8) != 8) {
+		if (Read4(p_chunkInfo, 8) != 8) {
 			result = MMIOERR_CANNOTREAD;
 		}
 		else {
@@ -483,7 +519,7 @@ MxU16 MXIOINFO::Descend(ISLE_MMCKINFO* p_chunkInfo, const ISLE_MMCKINFO* p_paren
 			}
 
 			if ((p_chunkInfo->ckid == FOURCC_RIFF || p_chunkInfo->ckid == FOURCC_LIST) &&
-				Read(&p_chunkInfo->fccType, 4) != 4) {
+				Read4(&p_chunkInfo->fccType, 4) != 4) {
 				result = MMIOERR_CANNOTREAD;
 			}
 		}
@@ -505,7 +541,7 @@ MxU16 MXIOINFO::Descend(ISLE_MMCKINFO* p_chunkInfo, const ISLE_MMCKINFO* p_paren
 		tmp.dwFlags = 0;
 
 		while (running) {
-			if (Read(&tmp, 8) != 8) {
+			if (Read4(&tmp, 8) != 8) {
 				// If the first read fails, report read error. Else EOF.
 				result = readOk ? MMIOERR_CHUNKNOTFOUND : MMIOERR_CANNOTREAD;
 				running = FALSE;
@@ -524,7 +560,7 @@ MxU16 MXIOINFO::Descend(ISLE_MMCKINFO* p_chunkInfo, const ISLE_MMCKINFO* p_paren
 					running = FALSE;
 				}
 				else if ((p_descend == MMIO_FINDLIST && tmp.ckid == FOURCC_LIST) || (p_descend == MMIO_FINDRIFF && tmp.ckid == FOURCC_RIFF)) {
-					if (Read(&tmp.fccType, 4) != 4) {
+					if (Read4(&tmp.fccType, 4) != 4) {
 						result = MMIOERR_CANNOTREAD;
 						running = FALSE;
 					}

@@ -41,6 +41,9 @@
 
 #include "SDL_iostream_c.h"
 
+#define SDL_copyp(dst, src)                                                                 \
+    { SDL_COMPILE_TIME_ASSERT(SDL_copyp, sizeof (*(dst)) == sizeof (*(src))); }             \
+    SDL_memcpy((dst), (src), sizeof(*(src)))
 
 
 /* This file provides a general interface for SDL to read and write
@@ -104,6 +107,7 @@ static int SDL_fdatasync(int fd)
 
 static Sint64 SDLCALL fd_seek(void *userdata, Sint64 offset, SDL_IOWhence whence)
 {
+    printf("fd_seek, %d, %d", offset, whence);
     IOStreamFDData *iodata = (IOStreamFDData *) userdata;
     int fdwhence;
 
@@ -131,6 +135,7 @@ static Sint64 SDLCALL fd_seek(void *userdata, Sint64 offset, SDL_IOWhence whence
 
 static size_t SDLCALL fd_read(void *userdata, void *ptr, size_t size, SDL_IOStatus *status)
 {
+    printf("fd_read, %d", size);
     IOStreamFDData *iodata = (IOStreamFDData *) userdata;
     ssize_t bytes;
     do {
@@ -196,6 +201,7 @@ static SDL_bool SDLCALL fd_close(void *userdata)
 
 SDL_IOStream *SDL_IOFromFD(int fd, SDL_bool autoclose)
 {
+    printf("SDL_IOFromFD\n");
     IOStreamFDData *iodata = (IOStreamFDData *) SDL_calloc(1, sizeof (*iodata));
     if (!iodata) {
         if (autoclose) {
@@ -289,6 +295,8 @@ static Sint64 SDLCALL stdio_seek(void *userdata, Sint64 offset, SDL_IOWhence whe
     IOStreamStdioData *iodata = (IOStreamStdioData *) userdata;
     int stdiowhence;
 
+    printf("stdio_seek: %d, %x02\n", offset, iodata->fp);
+
     switch (whence) {
     case SDL_IO_SEEK_SET:
         stdiowhence = SEEK_SET;
@@ -326,11 +334,16 @@ static Sint64 SDLCALL stdio_seek(void *userdata, Sint64 offset, SDL_IOWhence whe
     return -1;
 }
 
+#include <sys/syslimits.h>
+#include <fcntl.h>
+
 static size_t SDLCALL stdio_read(void *userdata, void *ptr, size_t size, SDL_IOStatus *status)
 {
     IOStreamStdioData *iodata = (IOStreamStdioData *) userdata;
+    
+    printf("stdio_read: %d, %x02\n", size, iodata->fp);
     const size_t bytes = fread(ptr, 1, size, iodata->fp);
-    if (bytes == 0 && ferror(iodata->fp)) {
+    if (bytes == 0) {
         if (errno == EAGAIN) {
             *status = SDL_IO_STATUS_NOT_READY;
             clearerr(iodata->fp);
@@ -395,6 +408,7 @@ static SDL_bool SDLCALL stdio_close(void *userdata)
 
 SDL_IOStream *SDL_IOFromFP(FILE *fp, SDL_bool autoclose)
 {
+    printf("SDL_IOFromFP\n");
     IOStreamStdioData *iodata = (IOStreamStdioData *) SDL_calloc(1, sizeof (*iodata));
     if (!iodata) {
         if (autoclose) {
@@ -529,6 +543,7 @@ static SDL_bool IsRegularFileOrPipe(FILE *f)
 
 SDL_IOStream *SDL_IOFromFile(const char *file, const char *mode)
 {
+    printf("SDL_IOFromFile: %s\n", file);
     SDL_IOStream *iostr = NULL;
 
     if (!file || !*file) {
@@ -629,8 +644,10 @@ SDL_IOStream *SDL_IOFromFile(const char *file, const char *mode)
         #endif
 
         if (!fp) {
+            puts("balls\n");
             SDL_SetError("Couldn't open %s: %s", file, strerror(errno));
         } else if (!IsRegularFileOrPipe(fp)) {
+            puts("balls2\n");
             fclose(fp);
             fp = NULL;
             SDL_SetError("%s is not a regular file or pipe", file);
@@ -855,7 +872,7 @@ SDL_IOStream *SDL_OpenIO(const SDL_IOStreamInterface *iface, void *userdata)
 
     SDL_IOStream *iostr = (SDL_IOStream *)SDL_calloc(1, sizeof(*iostr));
     if (iostr) {
-        //SDL_copyp(&iostr->iface, iface);
+        SDL_copyp(&iostr->iface, iface);
         iostr->userdata = userdata;
     }
     return iostr;
@@ -1075,6 +1092,8 @@ size_t SDL_ReadIO(SDL_IOStream *context, void *ptr, size_t size)
             context->status = SDL_IO_STATUS_EOF;
         }
     }
+
+    printf("SDL_ReadIO: %d\n", bytes);
     return bytes;
 }
 

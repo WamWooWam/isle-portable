@@ -20,13 +20,13 @@ LegoPaletteEntry::LegoPaletteEntry()
 LegoResult LegoPaletteEntry::Read(LegoStorage* p_storage)
 {
 	LegoResult result;
-	if ((result = p_storage->Read(&m_color.r, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->ReadU8(&m_color.r)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Read(&m_color.g, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->ReadU8(&m_color.g)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Read(&m_color.b, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->ReadU8(&m_color.b)) != SUCCESS) {
 		return result;
 	}
 	return SUCCESS;
@@ -36,13 +36,13 @@ LegoResult LegoPaletteEntry::Read(LegoStorage* p_storage)
 LegoResult LegoPaletteEntry::Write(LegoStorage* p_storage) const
 {
 	LegoResult result;
-	if ((result = p_storage->Write(&m_color.r, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->WriteU8((LegoU8*)&m_color.r)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Write(&m_color.g, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->WriteU8((LegoU8*)&m_color.g)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Write(&m_color.b, sizeof(Uint8))) != SUCCESS) {
+	if ((result = p_storage->WriteU8((LegoU8*)&m_color.b)) != SUCCESS) {
 		return result;
 	}
 	return SUCCESS;
@@ -74,13 +74,13 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 {
 	LegoResult result;
 	LegoU32 width, height, count;
-	if ((result = p_storage->Read(&width, sizeof(LegoU32))) != SUCCESS) {
+	if ((result = p_storage->ReadU32(&width)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Read(&height, sizeof(LegoU32))) != SUCCESS) {
+	if ((result = p_storage->ReadU32(&height)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Read(&count, sizeof(LegoU32))) != SUCCESS) {
+	if ((result = p_storage->ReadU32(&count)) != SUCCESS) {
 		return result;
 	}
 	if (m_palette) {
@@ -156,13 +156,13 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 LegoResult LegoImage::Write(LegoStorage* p_storage)
 {
 	LegoResult result;
-	if ((result = p_storage->Write(&m_surface->w, sizeof(int))) != SUCCESS) {
+	if ((result = p_storage->WriteS32(&m_surface->w)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Write(&m_surface->h, sizeof(int))) != SUCCESS) {
+	if ((result = p_storage->WriteS32(&m_surface->h)) != SUCCESS) {
 		return result;
 	}
-	if ((result = p_storage->Write(&m_palette->ncolors, sizeof(int))) != SUCCESS) {
+	if ((result = p_storage->WriteS32(&m_palette->ncolors)) != SUCCESS) {
 		return result;
 	}
 	if (m_palette) {

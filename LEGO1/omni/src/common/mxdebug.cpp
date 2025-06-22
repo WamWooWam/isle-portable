@@ -1,6 +1,6 @@
 #include "mxdebug.h"
 
-#ifdef _DEBUG
+#if 1
 
 // Debug-only wrapper for OutputDebugString to support variadic arguments.
 // Identical functions at BETA10 0x100ec9fe and 0x101741b5 are more limited in scope.
@@ -21,7 +21,8 @@ void _MxTrace(const char* format, ...)
 	va_list args;
 
 	va_start(args, format);
-	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_TRACE, format, args);
+	// SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG, format, args);
+	vprintf(format, args);
 	va_end(args);
 }
 

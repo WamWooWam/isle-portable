@@ -21,6 +21,8 @@ ISLEPROGRESS.*
 *.pyc
 tools/ghidra_scripts/import.log
 
+/media/
+
 # By convention we put the retail binaries into ./legobin.
 # These entries are kept for now since that convention has not always been around.
 ISLE.EXE

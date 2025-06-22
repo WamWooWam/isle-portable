@@ -130,6 +130,8 @@ function(add_cxx_warning WARNING)
     endif()
 endfunction()
 
+add_compile_options("-g" "-gstabs+" "-mmacosx-version-min=10.4" "-fstack-protector-all")
+
 add_subdirectory(3rdparty EXCLUDE_FROM_ALL SYSTEM)
 
 add_cxx_warning(parentheses)

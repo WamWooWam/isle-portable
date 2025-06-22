@@ -116,7 +116,7 @@ MxResult MxSoundManager::Create(MxU32 p_frequencyMS, MxBool p_createThread)
 //		TickleManager()->RegisterClient(this, p_frequencyMS);
 //	}
 //
-//	status = SUCCESS;
+	status = SUCCESS;
 
 done:
 	if (status != SUCCESS) {

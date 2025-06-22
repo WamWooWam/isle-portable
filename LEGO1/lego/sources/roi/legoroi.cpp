@@ -154,7 +154,7 @@ LegoResult LegoROI::Read(
 	SET3(m_bounding_box.Min(), box.GetMin());
 	SET3(m_bounding_box.Max(), box.GetMax());
 
-	if (p_storage->Read(&length, sizeof(LegoU32)) != SUCCESS) {
+	if (p_storage->ReadU32(&length) != SUCCESS) {
 		goto done;
 	}
 
@@ -193,7 +193,7 @@ LegoResult LegoROI::Read(
 		}
 	}
 	else {
-		if (p_storage->Read(&numLODs, sizeof(LegoU32)) != SUCCESS) {
+		if (p_storage->ReadU32(&numLODs) != SUCCESS) {
 			goto done;
 		}
 
@@ -204,7 +204,7 @@ LegoResult LegoROI::Read(
 			const LegoChar* roiName = m_name;
 			LegoU32 offset;
 
-			if (p_storage->Read(&offset, sizeof(LegoU32)) != SUCCESS) {
+			if (p_storage->ReadU32(&offset) != SUCCESS) {
 				goto done;
 			}
 
@@ -313,7 +313,7 @@ LegoResult LegoROI::Read(
 		}
 	}
 
-	if (p_storage->Read(&numROIs, sizeof(LegoU32)) != SUCCESS) {
+	if (p_storage->ReadU32(&numROIs) != SUCCESS) {
 		goto done;
 	}
 

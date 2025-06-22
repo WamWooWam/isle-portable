@@ -50,6 +50,12 @@
 #include "emscripten/messagebox.h"
 #endif
 
+#include <SDL3/SDL_directory.h>
+#include <SDL3/SDL_sysmain.h>
+
+#define SDL_PRIx32 "x"
+#define SDL_clamp(x, a, b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+
 DECOMP_SIZE_ASSERT(IsleApp, 0x8c)
 
 // GLOBAL: ISLE 0x410030
@@ -87,7 +93,8 @@ MxS32 g_reqEnableRMDevice = FALSE;
 
 SDL_Window* window;
 
-extern const char* g_files[46];
+extern const char* g_files[45];
+
 
 // FUNCTION: ISLE 0x401000
 IsleApp::IsleApp()
@@ -254,24 +261,381 @@ void IsleApp::SetupVideoFlags(
 	}
 }
 
+SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
+{
+	// printf("SDL_AppInit\n");
 
+	*appstate = NULL;
 
-//MxU8 IsleApp::MapMouseButtonFlagsToModifier(SDL_MouseButtonFlags p_flags)
-//{
-//	// [library:window]
-//	// Map button states to Windows button states (LegoEventNotificationParam)
-//	// Not mapping mod keys SHIFT and CTRL since they are not used by the game.
-//
-//	MxU8 modifier = 0;
-//	if (p_flags & SDL_BUTTON_LMASK) {
-//		modifier |= LegoEventNotificationParam::c_lButtonState;
-//	}
-//	if (p_flags & SDL_BUTTON_RMASK) {
-//		modifier |= LegoEventNotificationParam::c_rButtonState;
-//	}
-//
-//	return modifier;
-//}
+	// SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+	// SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK)) {
+		char buffer[256];
+		SDL_snprintf(
+			buffer,
+			sizeof(buffer),
+			"\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again.\nSDL error: %s",
+			SDL_GetError()
+		);
+		Any_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "LEGO® Island Error", buffer, NULL);
+		return SDL_APP_FAILURE;
+	}
+
+	// [library:window]
+	// Original game checks for an existing instance here.
+	// We don't really need that.
+
+	// Create global app instance
+	g_isle = new IsleApp();
+
+	if (g_isle->ParseArguments(argc, argv) != SUCCESS) {
+		Any_ShowSimpleMessageBox(
+			SDL_MESSAGEBOX_ERROR,
+			"LEGO® Island Error",
+			"\"LEGO® Island\" failed to start.  Invalid CLI arguments.",
+			window
+		);
+		return SDL_APP_FAILURE;
+	}
+
+	// Create window
+	if (g_isle->SetupWindow() != SUCCESS) {
+		Any_ShowSimpleMessageBox(
+			SDL_MESSAGEBOX_ERROR,
+			"LEGO® Island Error",
+			"\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again.",
+			window
+		);
+		return SDL_APP_FAILURE;
+	}
+
+	// Get reference to window
+	*appstate = g_isle->GetWindowHandle();
+
+#ifdef __EMSCRIPTEN__
+	SDL_AddEventWatch(
+		[](void* userdata, SDL_Event* event) -> bool {
+			if (event->type == SDL_EVENT_TERMINATING && g_isle && g_isle->GetGameStarted()) {
+				GameState()->Save(0);
+				return false;
+			}
+
+			return true;
+		},
+		NULL
+	);
+#endif
+	return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult SDL_AppIterate(void* appstate)
+{
+	// printf("SDL_AppIterate\n");
+
+	if (g_closed) {
+		return SDL_APP_SUCCESS;
+	}
+
+	if (!g_isle->Tick()) {
+		Any_ShowSimpleMessageBox(
+			SDL_MESSAGEBOX_ERROR,
+			"LEGO® Island Error",
+			"\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again."
+			"\nFailed to initialize; see logs for details",
+			NULL
+		);
+		return SDL_APP_FAILURE;
+	}
+
+	if (!g_closed) {
+		IsleDebug_Render();
+
+		if (g_reqEnableRMDevice) {
+			g_reqEnableRMDevice = FALSE;
+			VideoManager()->EnableRMDevice();
+			g_rmDisabled = FALSE;
+			Lego()->Resume();
+		}
+
+		if (g_closed) {
+			return SDL_APP_SUCCESS;
+		}
+
+		if (g_mousedown && g_mousemoved && g_isle) {
+			if (!g_isle->Tick()) {
+				Any_ShowSimpleMessageBox(
+					SDL_MESSAGEBOX_ERROR,
+					"LEGO® Island Error",
+					"\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again."
+					"\nFailed to initialize; see logs for details",
+					NULL
+				);
+				return SDL_APP_FAILURE;
+			}
+		}
+
+		if (g_mousemoved) {
+			g_mousemoved = FALSE;
+		}
+	}
+
+	return SDL_APP_CONTINUE;
+}
+
+SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
+{
+	// printf("SDL_AppEvent\n");
+
+	if (!g_isle) {
+		return SDL_APP_CONTINUE;
+	}
+
+	if (IsleDebug_Event(event)) {
+		return SDL_APP_CONTINUE;
+	}
+
+	// [library:window]
+	// Remaining functionality to be implemented:
+	// WM_TIMER - use SDL_Timer functionality instead
+
+#ifdef __EMSCRIPTEN__
+	// Workaround for the fact we are getting both mouse & touch events on mobile devices running Emscripten.
+	// On desktops, we are only getting mouse events, but a touch device (pen_input) may also be present...
+	// See: https://github.com/libsdl-org/SDL/issues/13161
+	static bool detectedTouchEvents = false;
+#endif
+
+	switch (event->type) {
+	case SDL_MOUSEMOTION:
+	case SDL_MOUSEBUTTONUP:
+	case SDL_MOUSEBUTTONDOWN:
+		IDirect3DRMMiniwinDevice* device = GetD3DRMMiniwinDevice();
+		if (device && !device->ConvertEventToRenderCoordinates(event)) {
+			SDL_Log("Failed to convert event coordinates: %s", SDL_GetError());
+		}
+		break;
+	}
+
+	switch (event->type) {
+	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		if (!IsleDebug_Enabled()) {
+			g_isle->SetWindowActive(TRUE);
+			Lego()->Resume();
+		}
+		break;
+	case SDL_WINDOWEVENT_FOCUS_LOST:
+		if (!IsleDebug_Enabled() && g_isle->GetGameStarted()) {
+			g_isle->SetWindowActive(FALSE);
+			Lego()->Pause();
+#ifdef __EMSCRIPTEN__
+			GameState()->Save(0);
+#endif
+		}
+		break;
+	case SDL_WINDOWEVENT_CLOSE:
+		if (!g_closed) {
+			delete g_isle;
+			g_isle = NULL;
+			g_closed = TRUE;
+		}
+		break;
+	case SDL_KEYDOWN: {
+		if (event->key.repeat) {
+			break;
+		}
+
+		SDL_Keycode keyCode = event->key.keysym.sym;
+
+		if (event->key.keysym.mod == KMOD_ALT && keyCode == SDLK_RETURN) {
+			SDL_SetWindowFullscreen(window, !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN));
+		}
+		else {
+			if (InputManager()) {
+				InputManager()->QueueEvent(c_notificationKeyPress, keyCode, 0, 0, keyCode);
+			}
+		}
+		break;
+	}
+	case SDL_MOUSEMOTION:
+#ifdef __EMSCRIPTEN__
+		if (detectedTouchEvents) {
+			break;
+		}
+#endif
+		g_mousemoved = TRUE;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(
+				c_notificationMouseMove,
+				IsleApp::MapMouseButtonFlagsToModifier(event->motion.state),
+				event->motion.x,
+				event->motion.y,
+				0
+			);
+		}
+
+		if (g_isle->GetDrawCursor()) {
+			VideoManager()->MoveCursor(Min((MxS32) event->motion.x, 639), Min((MxS32) event->motion.y, 479));
+		}
+		break;
+	case SDL_FINGERMOTION: {
+#ifdef __EMSCRIPTEN__
+		detectedTouchEvents = true;
+#endif
+		g_mousemoved = TRUE;
+
+		float x = SDL_clamp(event->tfinger.x, 0, 1) * 640;
+		float y = SDL_clamp(event->tfinger.y, 0, 1) * 480;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(c_notificationMouseMove, LegoEventNotificationParam::c_lButtonState, x, y, 0);
+		}
+
+		if (g_isle->GetDrawCursor()) {
+			VideoManager()->MoveCursor(Min((MxS32) x, 639), Min((MxS32) y, 479));
+		}
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN:
+#ifdef __EMSCRIPTEN__
+		if (detectedTouchEvents) {
+			break;
+		}
+#endif
+		g_mousedown = TRUE;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(
+				c_notificationButtonDown,
+				IsleApp::MapMouseButtonFlagsToModifier(SDL_GetMouseState(NULL, NULL)),
+				event->button.x,
+				event->button.y,
+				0
+			);
+		}
+		break;
+	case SDL_FINGERDOWN: {
+#ifdef __EMSCRIPTEN__
+		detectedTouchEvents = true;
+#endif
+		g_mousedown = TRUE;
+
+		float x = SDL_clamp(event->tfinger.x, 0, 1) * 640;
+		float y = SDL_clamp(event->tfinger.y, 0, 1) * 480;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(c_notificationButtonDown, LegoEventNotificationParam::c_lButtonState, x, y, 0);
+		}
+		break;
+	}
+	case SDL_MOUSEBUTTONUP:
+#ifdef __EMSCRIPTEN__
+		if (detectedTouchEvents) {
+			// Abusing the fact (bug?) that we are always getting mouse events on Emscripten.
+			// This functionality should be enabled in a more general way with touch events,
+			// but SDL touch event's don't have a "double tap" indicator right now.
+			if (event->button.clicks == 2) {
+				InputManager()->QueueEvent(c_notificationKeyPress, SDLK_SPACE, 0, 0, SDLK_SPACE);
+			}
+			break;
+		}
+#endif
+		g_mousedown = FALSE;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(
+				c_notificationButtonUp,
+				IsleApp::MapMouseButtonFlagsToModifier(SDL_GetMouseState(NULL, NULL)),
+				event->button.x,
+				event->button.y,
+				0
+			);
+		}
+		break;
+	case SDL_FINGERUP: {
+#ifdef __EMSCRIPTEN__
+		detectedTouchEvents = true;
+#endif
+		g_mousedown = FALSE;
+
+		float x = SDL_clamp(event->tfinger.x, 0, 1) * 640;
+		float y = SDL_clamp(event->tfinger.y, 0, 1) * 480;
+
+		if (InputManager()) {
+			InputManager()->QueueEvent(c_notificationButtonUp, 0, x, y, 0);
+		}
+		break;
+	}
+	case SDL_QUIT:
+		return SDL_APP_SUCCESS;
+		break;
+	}
+
+	if (event->user.type == g_legoSdlEvents.m_windowsMessage) {
+		switch (event->user.code) {
+		case WM_ISLE_SETCURSOR:
+			g_isle->SetupCursor((Cursor) (uintptr_t) event->user.data1);
+			break;
+		case WM_TIMER:
+			if (InputManager()) {
+				InputManager()->QueueEvent(c_notificationTimer, (MxU8) (uintptr_t) event->user.data1, 0, 0, 0);
+			}
+			break;
+		default:
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown SDL Windows message: 0x%" SDL_PRIx32, event->user.code);
+			break;
+		}
+	}
+	else if (event->user.type == g_legoSdlEvents.m_presenterProgress) {
+		MxDSAction* action = static_cast<MxDSAction*>(event->user.data1);
+		MxPresenter::TickleState state = static_cast<MxPresenter::TickleState>(event->user.code);
+
+#ifdef __EMSCRIPTEN__
+		if (!g_isle->GetGameStarted()) {
+			Emscripten_SendPresenterProgress(action, state);
+		}
+#endif
+
+		if (!g_isle->GetGameStarted() && action && state == MxPresenter::e_ready &&
+			!SDL_strncmp(action->GetObjectName(), "Lego_Smk", 8)) {
+			g_isle->SetGameStarted(TRUE);
+			SDL_Log("Game started");
+		}
+	}
+
+	return SDL_APP_CONTINUE;
+}
+
+void SDL_AppQuit(void* appstate, SDL_AppResult result)
+{
+	printf("SDL_AppQuit\n");
+
+	IsleDebug_Quit();
+
+	if (appstate != NULL) {
+		SDL_DestroyWindow((SDL_Window*) appstate);
+	}
+
+	SDL_Quit();
+}
+
+MxU8 IsleApp::MapMouseButtonFlagsToModifier(Uint32 p_flags)
+{
+	// [library:window]
+	// Map button states to Windows button states (LegoEventNotificationParam)
+	// Not mapping mod keys SHIFT and CTRL since they are not used by the game.
+
+	MxU8 modifier = 0;
+	if (p_flags & SDL_BUTTON_LMASK) {
+		modifier |= LegoEventNotificationParam::c_lButtonState;
+	}
+	if (p_flags & SDL_BUTTON_RMASK) {
+		modifier |= LegoEventNotificationParam::c_rButtonState;
+	}
+
+	return modifier;
+}
 
 // FUNCTION: ISLE 0x4023e0
 MxResult IsleApp::SetupWindow()
@@ -302,48 +666,55 @@ MxResult IsleApp::SetupWindow()
 	m_cursorNo = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
 	SDL_SetCursor(m_cursorCurrent);
 
-//	SDL_PropertiesID props = SDL_CreateProperties();
-//	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, g_targetWidth);
-//	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, g_targetHeight);
-//	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, m_fullScreen);
-//	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, WINDOW_TITLE);
-//#ifdef MINIWIN
-//	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
-//#endif
-//
-//	window = SDL_CreateWindowWithProperties(props);
-//#ifdef MINIWIN
-//	m_windowHandle = reinterpret_cast<HWND>(window);
-//#else
-//	m_windowHandle =
-//		(HWND) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
-//#endif
-//
-//	SDL_DestroyProperties(props);
-	
-	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, g_targetWidth, g_targetHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+	//	SDL_PropertiesID props = SDL_CreateProperties();
+	//	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, g_targetWidth);
+	//	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, g_targetHeight);
+	//	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, m_fullScreen);
+	//	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, WINDOW_TITLE);
+	// #ifdef MINIWIN
+	//	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
+	// #endif
+	//
+	//	window = SDL_CreateWindowWithProperties(props);
+	// #ifdef MINIWIN
+	//	m_windowHandle = reinterpret_cast<HWND>(window);
+	// #else
+	//	m_windowHandle =
+	//		(HWND) SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+	// #endif
+	//
+	//	SDL_DestroyProperties(props);
+
+	window = SDL_CreateWindow(
+		WINDOW_TITLE,
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		g_targetWidth,
+		g_targetHeight,
+		0
+	);
 	m_windowHandle = reinterpret_cast<HWND>(window);
 
 	if (!m_windowHandle) {
 		return FAILURE;
 	}
 
-	//SDL_IOStream* icon_stream = SDL_IOFromMem(isle_bmp, isle_bmp_len);
-//
-//	if (icon_stream) {
-//		SDL_Surface* icon = SDL_LoadBMP_IO(icon_stream, true);
-//
-//		if (icon) {
-//			SDL_SetWindowIcon(window, icon);
-//			SDL_DestroySurface(icon);
-//		}
-//		else {
-//			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load icon: %s", SDL_GetError());
-//		}
-//	}
-//	else {
-//		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open SDL_IOStream for icon: %s", SDL_GetError());
-//	}
+	// SDL_IOStream* icon_stream = SDL_IOFromMem(isle_bmp, isle_bmp_len);
+	//
+	//	if (icon_stream) {
+	//		SDL_Surface* icon = SDL_LoadBMP_IO(icon_stream, true);
+	//
+	//		if (icon) {
+	//			SDL_SetWindowIcon(window, icon);
+	//			SDL_DestroySurface(icon);
+	//		}
+	//		else {
+	//			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load icon: %s", SDL_GetError());
+	//		}
+	//	}
+	//	else {
+	//		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open SDL_IOStream for icon: %s", SDL_GetError());
+	//	}
 
 	if (!SetupLegoOmni()) {
 		return FAILURE;
@@ -563,7 +934,7 @@ inline bool IsleApp::Tick()
 	static MxLong g_lastFrameTime = 0;
 
 	// GLOBAL: ISLE 0x4101bc
-	static MxS32 g_startupDelay = 200;
+	static MxS32 g_startupDelay = 50;
 
 	if (IsleDebug_Paused() && IsleDebug_StepModeEnabled()) {
 		IsleDebug_SetPaused(false);
@@ -724,10 +1095,10 @@ MxResult IsleApp::VerifyFilesystem()
 			path += file;
 			path.MapPathToFilesystem();
 
-			//if (SDL_GetPathInfo(path.GetData(), NULL)) {
-//				found = true;
-//				break;
-//			}
+			if (SDL_GetPathInfo(path.GetData(), NULL) == SDL_TRUE) {
+				found = true;
+				break;
+			}
 		}
 
 		if (!found) {
@@ -777,67 +1148,4 @@ IDirect3DRMMiniwinDevice* GetD3DRMMiniwinDevice()
 		return nullptr;
 	}
 	return d3drmMiniwinDev;
-}
-
-int main(int argc, char** argv) {
-	//SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
-	//SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
-	
-	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK)) {
-		char buffer[256];
-		SDL_snprintf(
-					 buffer,
-					 sizeof(buffer),
-					 "\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again.\nSDL error: %s",
-					 SDL_GetError()
-					 );
-		Any_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "LEGO® Island Error", buffer, NULL);
-		return -1;
-	}
-	
-	// [library:window]
-	// Original game checks for an existing instance here.
-	// We don't really need that.
-	
-	// Create global app instance
-	g_isle = new IsleApp();
-	
-	if (g_isle->ParseArguments(argc, argv) != SUCCESS) {
-		Any_ShowSimpleMessageBox(
-								 SDL_MESSAGEBOX_ERROR,
-								 "LEGO® Island Error",
-								 "\"LEGO® Island\" failed to start.  Invalid CLI arguments.",
-								 window
-								 );
-		return -1;
-	}
-	
-	// Create window
-	if (g_isle->SetupWindow() != SUCCESS) {
-		Any_ShowSimpleMessageBox(
-								 SDL_MESSAGEBOX_ERROR,
-								 "LEGO® Island Error",
-								 "\"LEGO® Island\" failed to start.\nPlease quit all other applications and try again.",
-								 window
-								 );
-		return -1;
-	}
-	
-	// Get reference to window
-	auto appstate = g_isle->GetWindowHandle();
-	
-#ifdef __EMSCRIPTEN__
-	SDL_AddEventWatch(
-					  [](void* userdata, SDL_Event* event) -> bool {
-					  if (event->type == SDL_EVENT_TERMINATING && g_isle && g_isle->GetGameStarted()) {
-					  GameState()->Save(0);
-					  return false;
-					  }
-					  
-					  return true;
-					  },
-					  NULL
-					  );
-#endif
-	return 0;
 }

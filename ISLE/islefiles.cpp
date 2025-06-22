@@ -1,4 +1,4 @@
-const char* g_files[46] = {
+const char* g_files[45] = {
 	"/LEGO/Scripts/CREDITS.SI",
 	"/LEGO/Scripts/INTRO.SI",
 	"/LEGO/Scripts/NOCD.SI",
@@ -17,7 +17,6 @@ const char* g_files[46] = {
 	"/LEGO/Scripts/Infocntr/INFOMAIN.SI",
 	"/LEGO/Scripts/Infocntr/INFOSCOR.SI",
 	"/LEGO/Scripts/Infocntr/REGBOOK.SI",
-	"/LEGO/Scripts/Isle/ISLE.SI",
 	"/LEGO/Scripts/Isle/JUKEBOX.SI",
 	"/LEGO/Scripts/Isle/JUKEBOXW.SI",
 	"/LEGO/Scripts/Police/POLICE.SI",

@@ -91,6 +91,12 @@ public:
 	MxU16 Ascend(ISLE_MMCKINFO*, MxU16);
 	MxU16 CreateChunk(ISLE_MMCKINFO* p_chunkInfo, MxU16 p_create);
 
+	// Endian safe functions
+	// TODO: is this really how i want to do this?
+	MxLong Read2(void*, MxLong);
+	MxLong Read4(void*, MxLong);
+	MxLong Read8(void*, MxLong);
+
 	// NOTE: In MXIOINFO, the `hmmio` member of MMIOINFO is used like
 	// an HFILE (int) instead of an HMMIO (WORD).
 	ISLE_MMIOINFO m_info;

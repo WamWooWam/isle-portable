@@ -306,22 +306,22 @@ MxResult LegoPlantManager::Read(LegoStorage* p_storage)
 	for (MxS32 i = 0; i < sizeOfArray(g_plantInfo); i++) {
 		LegoPlantInfo* info = &g_plantInfo[i];
 
-		if (p_storage->Read(&info->m_variant, sizeof(MxU8)) != SUCCESS) {
+		if (p_storage->ReadU8(&info->m_variant) != SUCCESS) {
 			goto done;
 		}
-		if (p_storage->Read(&info->m_sound, sizeof(MxU32)) != SUCCESS) {
+		if (p_storage->ReadU32(&info->m_sound) != SUCCESS) {
 			goto done;
 		}
-		if (p_storage->Read(&info->m_move, sizeof(MxU32)) != SUCCESS) {
+		if (p_storage->ReadU32(&info->m_move) != SUCCESS) {
 			goto done;
 		}
-		if (p_storage->Read(&info->m_mood, sizeof(MxU8)) != SUCCESS) {
+		if (p_storage->ReadU8(&info->m_mood) != SUCCESS) {
 			goto done;
 		}
-		if (p_storage->Read(&info->m_color, sizeof(MxU8)) != SUCCESS) {
+		if (p_storage->ReadU8(&info->m_color) != SUCCESS) {
 			goto done;
 		}
-		if (p_storage->Read(&info->m_counter, sizeof(MxS8)) != SUCCESS) {
+		if (p_storage->ReadU8((LegoU8*)&info->m_counter) != SUCCESS) {
 			goto done;
 		}
 

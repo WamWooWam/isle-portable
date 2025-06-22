@@ -25,6 +25,7 @@ add_library(miniwin STATIC EXCLUDE_FROM_ALL
   src/d3drm/backends/software/renderer.cpp
 )
 
+if(ISLE_USE_OGL1)
 find_package(OpenGL)
 find_package(GLEW)
 if(OpenGL_FOUND AND GLEW_FOUND)
@@ -34,6 +35,7 @@ if(OpenGL_FOUND AND GLEW_FOUND)
   target_link_libraries(miniwin PRIVATE OpenGL::GL GLEW::GLEW)
 else()
   message(STATUS "🧩 OpenGL 1.x support not enabled — needs OpenGL and GLEW")
+endif()
 endif()
 
 find_library(OPENGL_ES2_LIBRARY NAMES GLESv2)

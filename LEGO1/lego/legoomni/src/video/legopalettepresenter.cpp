@@ -57,7 +57,7 @@ MxResult LegoPalettePresenter::ParsePalette(MxStreamChunk* p_chunk)
 
 	LegoMemory stream((char*) p_chunk->GetData(), p_chunk->GetLength());
 	if (stream.Read(buffer, 40 * sizeof(MxU8)) == SUCCESS) {
-		if (stream.Read(palette, 256 * 4 * sizeof(MxU8)) == SUCCESS) {
+		if (stream.ReadU32((LegoU32*)palette, 256) == SUCCESS) {
 			m_palette = new MxPalette(palette);
 			if (m_palette) {
 				result = SUCCESS;

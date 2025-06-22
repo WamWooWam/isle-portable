@@ -53,14 +53,16 @@ public:
 	// FUNCTION: BETA10 0x10017ce0
 	LegoStorage* WriteS16(LegoS16 p_data)
 	{
-		Write(&p_data, sizeof(LegoS16));
+		LegoS16 copy = SDL_SwapLE16(p_data);
+		Write(&copy, sizeof(LegoS16));
 		return this;
 	}
 
 	// FUNCTION: BETA10 0x1004b110
 	LegoStorage* WriteU16(LegoU16 p_data)
 	{
-		Write(&p_data, sizeof(LegoU16));
+		LegoU16 copy = SDL_SwapLE16(p_data);
+		Write(&copy, sizeof(LegoU16));
 		return this;
 	}
 
@@ -68,7 +70,8 @@ public:
 	// FUNCTION: BETA10 0x10088540
 	LegoStorage* WriteS32(MxS32 p_data)
 	{
-		Write(&p_data, sizeof(MxS32));
+		MxS32 copy = SDL_SwapLE32(p_data);
+		Write(&copy, sizeof(MxS32));
 		return this;
 	}
 
@@ -76,14 +79,16 @@ public:
 	// FUNCTION: BETA10 0x1004b150
 	LegoStorage* WriteU32(MxU32 p_data)
 	{
-		Write(&p_data, sizeof(MxU32));
+		MxS32 copy = SDL_SwapLE32(p_data);
+		Write(&copy, sizeof(MxU32));
 		return this;
 	}
 
 	// FUNCTION: BETA10 0x10073610
 	LegoStorage* WriteFloat(LegoFloat p_data)
 	{
-		Write(&p_data, sizeof(LegoFloat));
+		LegoFloat copy = SDL_SwapLE32(p_data);
+		Write(&copy, sizeof(LegoFloat));
 		return this;
 	}
 
@@ -125,6 +130,7 @@ public:
 	LegoStorage* ReadS16(LegoS16& p_data)
 	{
 		Read(&p_data, sizeof(LegoS16));
+		p_data = SDL_SwapLE16(p_data);
 		return this;
 	}
 
@@ -132,6 +138,7 @@ public:
 	LegoStorage* ReadU16(LegoU16& p_data)
 	{
 		Read(&p_data, sizeof(LegoU16));
+		p_data = SDL_SwapLE16(p_data);
 		return this;
 	}
 
@@ -140,6 +147,7 @@ public:
 	LegoStorage* ReadS32(MxS32& p_data)
 	{
 		Read(&p_data, sizeof(MxS32));
+		p_data = SDL_SwapLE32(p_data);
 		return this;
 	}
 
@@ -148,6 +156,7 @@ public:
 	LegoStorage* ReadU32(MxU32& p_data)
 	{
 		Read(&p_data, sizeof(MxU32));
+		p_data = SDL_SwapLE32(p_data);
 		return this;
 	}
 
@@ -155,6 +164,7 @@ public:
 	LegoStorage* ReadFloat(LegoFloat& p_data)
 	{
 		Read(&p_data, sizeof(LegoFloat));
+		p_data = SDL_SwapLE32(p_data);
 		return this;
 	}
 
@@ -181,6 +191,96 @@ public:
 		delete[] text;
 		return this;
 	}
+
+	// Endian safe pointer read functions
+	LegoResult ReadU8(LegoU8* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(LegoU8) * cnt);
+		return retVal;
+	}
+
+	LegoResult ReadS16(LegoS16* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(LegoS16) * cnt);
+		// *p_data = SDL_SwapLE16(*p_data);
+		for (int i = 0; i < cnt; i++)
+			p_data[i] = SDL_SwapLE16(p_data[i]);
+		return retVal;
+	}
+
+	LegoResult ReadU16(LegoU16* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(LegoU16) * cnt);
+		for (int i = 0; i < cnt; i++)
+			p_data[i] = SDL_SwapLE16(p_data[i]);
+		return retVal;
+	}
+	
+	LegoResult ReadS32(MxS32* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(MxS32) * cnt);
+		for (int i = 0; i < cnt; i++)
+			p_data[i] = SDL_SwapLE32(p_data[i]);
+		return retVal;
+	}
+
+	LegoResult ReadU32(MxU32* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(MxU32) * cnt);
+		for (int i = 0; i < cnt; i++)
+			p_data[i] = SDL_SwapLE32(p_data[i]);
+		return retVal;
+	}
+
+	LegoResult ReadFloat(LegoFloat* p_data, int cnt = 1)
+	{
+		LegoResult retVal = Read(p_data, sizeof(LegoFloat));
+		for (int i = 0; i < cnt; i++)
+			p_data[i] = SDL_SwapLE32(p_data[i]);
+		return retVal;
+	}
+	
+	LegoResult WriteU8(LegoU8* p_data)
+	{
+		LegoResult retVal = Write(p_data, sizeof(LegoU8));
+		return retVal;
+	}
+	
+	LegoResult WriteS16(LegoS16* p_data)
+	{
+		LegoS16 copy = SDL_SwapLE16(*p_data);
+		LegoResult retVal = Write(&copy, sizeof(LegoS16));
+		return retVal;
+	}
+	
+	LegoResult WriteU16(LegoU16* p_data)
+	{
+		LegoU16 copy = SDL_SwapLE16(*p_data);
+		LegoResult retVal = Write(&copy, sizeof(LegoU16));
+		return retVal;
+	}
+	
+	LegoResult WriteS32(MxS32* p_data)
+	{
+		MxS32 copy = SDL_SwapLE32(*p_data);
+		LegoResult retVal = Write(&copy, sizeof(MxS32));
+		return retVal;
+	}
+	
+	LegoResult WriteU32(MxU32* p_data)
+	{
+		MxS32 copy = SDL_SwapLE32(*p_data);
+		LegoResult retVal = Write(&copy, sizeof(MxU32));
+		return retVal;
+	}
+	
+	LegoResult WriteFloat(LegoFloat* p_data)
+	{
+		LegoFloat copy = SDL_SwapLE32(*p_data);
+		LegoResult retVal = Write(&copy, sizeof(LegoFloat));
+		return retVal;
+	}
+
 
 	// SYNTHETIC: LEGO1 0x10045b00
 	// LegoStorage::`scalar deleting destructor'

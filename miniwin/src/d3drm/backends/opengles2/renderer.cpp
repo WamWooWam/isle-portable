@@ -37,7 +37,7 @@ Direct3DRMRenderer* OpenGLES2Renderer::Create(DWORD width, DWORD height)
 	SDL_Window* window = DDWindow;
 	bool testWindow = false;
 	if (!window) {
-		window = SDL_CreateWindow("OpenGL ES 2.0 test", width, height, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("OpenGL ES 2.0 test", width, height, 0);
 		testWindow = true;
 	}
 

@@ -303,7 +303,7 @@ HRESULT DirectDrawImpl::RestoreDisplayMode()
 HRESULT DirectDrawImpl::SetCooperativeLevel(HWND hWnd, DDSCLFlags dwFlags)
 {
 	SDL_Window* sdlWindow = reinterpret_cast<SDL_Window*>(hWnd);
-
+	printf("SetCooperativeLevel %d\n", sdlWindow);
 	if (sdlWindow) {
 		bool fullscreen;
 		if ((dwFlags & DDSCL_NORMAL) == DDSCL_NORMAL) {
@@ -316,11 +316,11 @@ HRESULT DirectDrawImpl::SetCooperativeLevel(HWND hWnd, DDSCLFlags dwFlags)
 			return DDERR_INVALIDPARAMS;
 		}
 
-		if (!SDL_SetWindowFullscreen(sdlWindow, fullscreen)) {
-#ifndef __EMSCRIPTEN__
-			return DDERR_GENERIC;
-#endif
-		}
+// 		if (!SDL_SetWindowFullscreen(sdlWindow, fullscreen)) {
+// #if !defined(__EMSCRIPTEN__) || !defined(__APPLE__)
+// 			return DDERR_GENERIC;
+// #endif
+// 		}
 		DDWindow = sdlWindow;
 		DDRenderer = SDL_CreateRenderer(DDWindow, -1, SDL_RENDERER_ACCELERATED);
 		// SDL_PropertiesID prop = SDL_GetRendererProperties(DDRenderer);

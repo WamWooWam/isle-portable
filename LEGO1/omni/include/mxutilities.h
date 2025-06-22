@@ -43,6 +43,19 @@ T UnalignedRead(MxU8* p_source)
 {
 	T value;
 	memcpy(&value, p_source, sizeof(T));
+
+	if constexpr (sizeof(T) == 2) {
+		value = SDL_SwapLE16(*(Uint16*) &value);
+	}
+
+	if constexpr (sizeof(T) == 4) {
+		value = SDL_SwapLE32(*(Uint32*) &value);
+	}
+
+	if constexpr (sizeof(T) == 8) {
+		value = SDL_SwapLE64(*(Uint64*) &value);
+	}
+
 	return value;
 }
 
@@ -50,6 +63,7 @@ template <class T>
 inline void GetScalar(MxU8*& p_source, T& p_dest)
 {
 	p_dest = *(T*) p_source;
+
 	p_source += sizeof(T);
 }
 

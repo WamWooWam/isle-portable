@@ -88,6 +88,10 @@ set(sdl3_backport_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdl3_backport")
 add_library(sdl3_backport STATIC
     ${sdl3_backport_SOURCE_DIR}/SDL_iostream.c
     ${sdl3_backport_SOURCE_DIR}/SDL_rand.cpp
+    ${sdl3_backport_SOURCE_DIR}/SDL_directory.cpp
+    ${sdl3_backport_SOURCE_DIR}/SDL_sysmain_callbacks.c
+    ${sdl3_backport_SOURCE_DIR}/SDL_main_callbacks.c
+    ${sdl3_backport_SOURCE_DIR}/SDL_runapp.c
 )
 target_include_directories(sdl3_backport PUBLIC ${sdl3_backport_SOURCE_DIR})
 target_link_libraries(sdl3_backport PUBLIC SDL2)

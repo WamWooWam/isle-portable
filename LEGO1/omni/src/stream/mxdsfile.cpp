@@ -56,20 +56,28 @@ MxResult MxDSFile::ReadChunks()
 	ISLE_MMCKINFO topChunk;
 	ISLE_MMCKINFO childChunk;
 	char tempBuffer[80];
+	MxU16 err = 0;
 
 	topChunk.fccType = FOURCC('O', 'M', 'N', 'I');
-	if (m_io.Descend(&topChunk, NULL, MMIO_FINDRIFF) != 0) {
-		MxTrace("Unable to find Streamer RIFF chunk in file: %s\n", m_filename);
+	if ((err = m_io.Descend(&topChunk, NULL, MMIO_FINDRIFF)) != 0) {
+		MxTrace("Unable to find Streamer RIFF chunk in file: %s, %d\n", m_filename.GetData(), err);
 		return FAILURE;
 	}
 
 	childChunk.ckid = FOURCC('M', 'x', 'H', 'd');
 	if (m_io.Descend(&childChunk, &topChunk, 0) != 0) {
-		MxTrace("Unable to find Header chunk in file: %s\n", m_filename);
+		MxTrace("Unable to find Header chunk in file: %s\n", m_filename.GetData());
 		return FAILURE;
 	}
 
-	m_io.Read(&m_header, 0x0c);
+	// m_io.Read(&m_header, 0x0c);
+
+	m_io.Read2(&m_header.m_majorVersion, 0x4);
+	m_io.Read4(&m_header.m_bufferSize, 0x4);
+	m_io.Read2(&m_header.m_streamBuffersNum, 0x4);
+
+	printf("%d, %d\n", m_header.m_majorVersion, m_header.m_minorVersion);
+
 	if ((m_header.m_majorVersion != SI_MAJOR_VERSION) || (m_header.m_minorVersion != SI_MINOR_VERSION)) {
 		sprintf(tempBuffer, "Wrong SI file version. %d.%d expected.", SI_MAJOR_VERSION, SI_MINOR_VERSION);
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "LEGO® Island Error", tempBuffer, NULL);
@@ -78,13 +86,13 @@ MxResult MxDSFile::ReadChunks()
 
 	childChunk.ckid = FOURCC('M', 'x', 'O', 'f');
 	if (m_io.Descend(&childChunk, &topChunk, 0) != 0) {
-		MxTrace("Unable to find Header chunk in file: %s\n", m_filename);
+		MxTrace("Unable to find Header chunk in file: %s\n", m_filename.GetData());
 		return FAILURE;
 	}
 
-	m_io.Read(&m_lengthInDWords, 4);
+	m_io.Read4(&m_lengthInDWords, 4);
 	m_pBuffer = new MxU32[m_lengthInDWords];
-	m_io.Read(m_pBuffer, m_lengthInDWords * 4);
+	m_io.Read4(m_pBuffer, m_lengthInDWords * 4);
 	return SUCCESS;
 }
 

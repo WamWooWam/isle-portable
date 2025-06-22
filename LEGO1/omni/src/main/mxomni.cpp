@@ -19,6 +19,7 @@
 
 #include <SDL2/SDL_filesystem.h>
 #include <SDL2/SDL_log.h>
+#include <SDL3/SDL_directory.h>
 
 // GLOBAL: LEGO1 0x101015b8
 MxString g_hdPath = "";
@@ -434,7 +435,7 @@ vector<MxString> MxOmni::GlobIsleFiles(const MxString& p_path)
 {
 	//assert(false);
 	int count;
-	char** files =  nullptr;//SDL_GlobDirectory(p_path.GetData(), NULL, 0, &count);
+	char** files = SDL_GlobDirectory(p_path.GetData(), NULL, 0, &count);
 	vector<MxString> result;
 
 	if (files == NULL) {

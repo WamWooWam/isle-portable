@@ -20,7 +20,7 @@ Direct3DRMRenderer* OpenGL1Renderer::Create(DWORD width, DWORD height)
 	SDL_Window* window = DDWindow;
 	bool testWindow = false;
 	if (!window) {
-		window = SDL_CreateWindow("OpenGL 1.2 test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("OpenGL 1.2 test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 		testWindow = true;
 	}
 

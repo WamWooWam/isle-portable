@@ -11,7 +11,8 @@
 static backend_t opfs = nullptr;
 static backend_t fetchfs = nullptr;
 
-extern const char* g_files[46];
+extern const char* g_files[45];
+
 
 void Emscripten_SetupConfig(const char* p_iniConfig)
 {
