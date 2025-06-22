@@ -22,7 +22,7 @@
 #include "radio.h"
 #include "scripts.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 DECOMP_SIZE_ASSERT(GasStation, 0x128)
 DECOMP_SIZE_ASSERT(GasStationState, 0x24)

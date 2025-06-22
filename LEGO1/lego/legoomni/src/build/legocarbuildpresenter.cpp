@@ -16,7 +16,7 @@
 #include "mxtimer.h"
 #include "realtime/realtime.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 DECOMP_SIZE_ASSERT(LegoCarBuildAnimPresenter::UnknownListEntry, 0x0c)
 DECOMP_SIZE_ASSERT(LegoCarBuildAnimPresenter, 0x150)

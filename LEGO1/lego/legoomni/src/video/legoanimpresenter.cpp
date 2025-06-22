@@ -26,7 +26,7 @@
 #include "realtime/realtime.h"
 #include "viewmanager/viewmanager.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <stdio.h>
 
 DECOMP_SIZE_ASSERT(LegoAnimPresenter, 0xbc)

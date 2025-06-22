@@ -5,7 +5,7 @@
 #include "meshutils.h"
 #include "miniwin.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -213,7 +213,7 @@ Uint32 Direct3DRMSoftwareRenderer::BlendPixel(Uint8* pixelAddr, Uint8 r, Uint8 g
 	}
 
 	Uint8 dstR, dstG, dstB, dstA;
-	SDL_GetRGBA(dstPixel, m_format, m_palette, &dstR, &dstG, &dstB, &dstA);
+	SDL_GetRGBA(dstPixel, m_format, &dstR, &dstG, &dstB, &dstA);
 
 	float alpha = a / 255.0f;
 	float invAlpha = 1.0f - alpha;
@@ -223,7 +223,7 @@ Uint32 Direct3DRMSoftwareRenderer::BlendPixel(Uint8* pixelAddr, Uint8 r, Uint8 g
 	Uint8 outB = static_cast<Uint8>(b * alpha + dstB * invAlpha);
 	Uint8 outA = static_cast<Uint8>(a + dstA * invAlpha);
 
-	return SDL_MapRGBA(m_format, m_palette, outR, outG, outB, outA);
+	return SDL_MapRGBA(m_format, outR, outG, outB, outA);
 }
 
 SDL_Color Direct3DRMSoftwareRenderer::ApplyLighting(
@@ -488,7 +488,7 @@ void Direct3DRMSoftwareRenderer::DrawTriangleProjected(
 					}
 
 					Uint8 tr, tg, tb, ta;
-					SDL_GetRGBA(texelColor, m_format, m_palette, &tr, &tg, &tb, &ta);
+					SDL_GetRGBA(texelColor, m_format, &tr, &tg, &tb, &ta);
 
 					// Multiply vertex color by texel color
 					r = (r * tr + 127) / 255;
@@ -496,7 +496,7 @@ void Direct3DRMSoftwareRenderer::DrawTriangleProjected(
 					b = (b * tb + 127) / 255;
 				}
 
-				finalColor = SDL_MapRGBA(m_format, m_palette, r, g, b, 255);
+				finalColor = SDL_MapRGBA(m_format, r, g, b, 255);
 			}
 			else {
 				finalColor = BlendPixel(pixelAddr, r, g, b, appearance.color.a);
@@ -531,7 +531,7 @@ void Direct3DRMSoftwareRenderer::AddTextureDestroyCallback(Uint32 id, IDirect3DR
 			auto& cacheEntry = ctx->renderer->m_textures[ctx->id];
 			if (cacheEntry.cached) {
 				SDL_UnlockSurface(cacheEntry.cached);
-				SDL_DestroySurface(cacheEntry.cached);
+				SDL_FreeSurface(cacheEntry.cached);
 				cacheEntry.cached = nullptr;
 				cacheEntry.texture = nullptr;
 			}
@@ -552,8 +552,8 @@ Uint32 Direct3DRMSoftwareRenderer::GetTextureId(IDirect3DRMTexture* iTexture)
 		if (texRef.texture == texture) {
 			if (texRef.version != texture->m_version) {
 				// Update animated textures
-				SDL_DestroySurface(texRef.cached);
-				texRef.cached = SDL_ConvertSurface(surface->m_surface, DDBackBuffer->format);
+				SDL_FreeSurface(texRef.cached);
+				texRef.cached = SDL_ConvertSurface(surface->m_surface, DDBackBuffer->format, 0);
 				SDL_LockSurface(texRef.cached);
 				texRef.version = texture->m_version;
 			}
@@ -561,7 +561,7 @@ Uint32 Direct3DRMSoftwareRenderer::GetTextureId(IDirect3DRMTexture* iTexture)
 		}
 	}
 
-	SDL_Surface* convertedRender = SDL_ConvertSurface(surface->m_surface, DDBackBuffer->format);
+	SDL_Surface* convertedRender = SDL_ConvertSurface(surface->m_surface, DDBackBuffer->format, 0);
 	SDL_LockSurface(convertedRender);
 
 	// Reuse freed slot
@@ -686,9 +686,9 @@ HRESULT Direct3DRMSoftwareRenderer::BeginFrame()
 	}
 	ClearZBuffer();
 
-	m_format = SDL_GetPixelFormatDetails(DDBackBuffer->format);
-	m_palette = SDL_GetSurfacePalette(DDBackBuffer);
-	m_bytesPerPixel = m_format->bits_per_pixel / 8;
+	m_format = DDBackBuffer->format;
+	m_palette = m_format->palette;
+	m_bytesPerPixel = m_format->BitsPerPixel / 8;
 
 	return DD_OK;
 }

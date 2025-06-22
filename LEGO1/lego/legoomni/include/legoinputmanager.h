@@ -8,10 +8,10 @@
 #include "mxpresenter.h"
 #include "mxqueue.h"
 
-#include <SDL3/SDL_joystick.h>
-#include <SDL3/SDL_keyboard.h>
-#include <SDL3/SDL_keycode.h>
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_joystick.h>
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_keycode.h>
+#include <SDL2/SDL_timer.h>
 #ifdef MINIWIN
 #include "miniwin/windows.h"
 #else
@@ -163,7 +163,7 @@ private:
 	MxBool m_unk0x81;                     // 0x81
 	LegoControlManager* m_controlManager; // 0x84
 	MxBool m_unk0x88;                     // 0x88
-	const bool* m_keyboardState;
+	const Uint8* m_keyboardState;
 	MxBool m_unk0x195; // 0x195
 	SDL_JoystickID* m_joyids;
 	SDL_Joystick* m_joystick;

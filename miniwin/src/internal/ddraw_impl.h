@@ -5,7 +5,7 @@
 #include "miniwin/d3d.h"
 #include "miniwin/ddraw.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 extern SDL_Window* DDWindow;
 extern SDL_Surface* DDBackBuffer;

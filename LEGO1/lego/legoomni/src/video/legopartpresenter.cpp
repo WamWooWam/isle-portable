@@ -10,7 +10,7 @@
 #include "mxdssubscriber.h"
 #include "viewmanager/viewlodlist.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 DECOMP_SIZE_ASSERT(LegoLODList, 0x18)
 DECOMP_SIZE_ASSERT(LegoNamedPart, 0x14)

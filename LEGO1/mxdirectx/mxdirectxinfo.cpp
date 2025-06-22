@@ -1,6 +1,6 @@
 #include "mxdirectxinfo.h"
 
-#include <SDL3/SDL_log.h>
+#include <SDL2/SDL_log.h>
 #include <assert.h>
 #include <stdio.h> // for vsprintf
 

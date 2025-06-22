@@ -1,10 +1,10 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <miniwin/ddraw.h>
 
 struct DirectDrawSurfaceImpl : public IDirectDrawSurface3 {
-	DirectDrawSurfaceImpl(int width, int height, SDL_PixelFormat format);
+	DirectDrawSurfaceImpl(int width, int height, int format);
 	~DirectDrawSurfaceImpl() override;
 
 	// IUnknown interface

@@ -6,7 +6,7 @@
 #include "mxtypes.h"
 #include "mxvideoparam.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #ifdef MINIWIN
 #include "miniwin/windows.h"
 #else
@@ -40,7 +40,7 @@ public:
 	bool Tick();
 	void SetupCursor(Cursor p_cursor);
 
-	static MxU8 MapMouseButtonFlagsToModifier(SDL_MouseButtonFlags p_flags);
+	// static MxU8 MapMouseButtonFlagsToModifier(SDL_MouseButtonFlags p_flags);
 
 	HWND GetWindowHandle() { return m_windowHandle; }
 	MxLong GetFrameDelta() { return m_frameDelta; }

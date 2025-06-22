@@ -3,7 +3,7 @@
 #include "decomp.h"
 #include "mxdebug.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <stdio.h>
 
 #define SI_MAJOR_VERSION 2

@@ -5,7 +5,7 @@
 #include "mxsemaphore.h"
 #include "mxtypes.h"
 
-#include <SDL3/SDL_thread.h>
+#include <SDL2/SDL_thread.h>
 
 class MxCore;
 

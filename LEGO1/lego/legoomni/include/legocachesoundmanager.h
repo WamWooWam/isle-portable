@@ -6,7 +6,7 @@
 #include "mxstl/stlcompat.h"
 #include "mxtypes.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 #pragma warning(disable : 4237)
 

@@ -2,7 +2,7 @@
 
 #include "structs.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <d3d9.h>
 #include <vector>
 #include <windows.h>

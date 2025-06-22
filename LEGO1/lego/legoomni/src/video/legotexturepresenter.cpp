@@ -9,7 +9,7 @@
 #include "mxdirectx/mxdirect3d.h"
 #include "mxdssubscriber.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 DECOMP_SIZE_ASSERT(LegoTexturePresenter, 0x54)
 DECOMP_SIZE_ASSERT(LegoNamedTexture, 0x14)

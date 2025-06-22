@@ -5,7 +5,7 @@
 #include "ddraw_impl.h"
 #include "ddsurface_impl.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 DEFINE_GUID(SDL3_GPU_GUID, 0x682656F3, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01);
@@ -92,8 +92,8 @@ private:
 	ViewportUniforms m_uniforms;
 	FragmentShadingData m_fragmentShadingData;
 	D3DDEVICEDESC m_desc;
-	std::vector<SDL3TextureCache> m_textures;
-	std::vector<SDL3MeshCache> m_meshs;
+	std::vector<SDL2TextureCache> m_textures;
+	std::vector<SDL2MeshCache> m_meshs;
 	SDL_GPUDevice* m_device;
 	SDL_GPUGraphicsPipeline* m_opaquePipeline;
 	SDL_GPUGraphicsPipeline* m_transparentPipeline;

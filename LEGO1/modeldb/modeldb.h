@@ -7,7 +7,7 @@
 #include "mxtypes.h"
 
 #include <SDL3/SDL_iostream.h>
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 // SIZE 0x18
 struct ModelDbPart {

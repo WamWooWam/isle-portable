@@ -8,7 +8,7 @@
 #include "mxutilities.h"
 #include "mxvariabletable.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <assert.h>
 
 DECOMP_SIZE_ASSERT(LegoMeterPresenter, 0x94)

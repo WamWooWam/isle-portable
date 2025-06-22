@@ -28,7 +28,7 @@
 #include "realtime/realtime.h"
 #include "viewmanager/viewmanager.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <vec.h>
 
@@ -316,6 +316,13 @@ float g_unk0x100f7500 = 0.1f;
 
 // GLOBAL: LEGO1 0x100f7504
 MxS32 g_unk0x100f7504 = 0;
+
+#include <random>
+static float SDL_randf() {
+	static std::default_random_engine e;
+	static std::uniform_real_distribution<> dis(0,1);
+	return dis(e);
+}
 
 // FUNCTION: LEGO1 0x1005eb50
 void LegoAnimationManager::configureLegoAnimationManager(MxS32 p_legoAnimationManagerConfig)
@@ -641,22 +648,22 @@ MxResult LegoAnimationManager::LoadWorldInfo(LegoOmni::World p_worldId)
 		strcat(path, filename);
 		MxString::MapPathToFilesystem(path);
 
-		SDL_PathInfo pathInfo;
-
-		if (!SDL_GetPathInfo(path, &pathInfo) || pathInfo.type != SDL_PATHTYPE_FILE) {
-			sprintf(path, "%s", MxOmni::GetCD());
-
-			if (path[strlen(path) - 1] != '\\') {
-				strcat(path, "\\");
-			}
-
-			strcat(path, filename);
-			MxString::MapPathToFilesystem(path);
-
-			if (!SDL_GetPathInfo(path, &pathInfo) || pathInfo.type != SDL_PATHTYPE_FILE) {
-				goto done;
-			}
-		}
+		//SDL_PathInfo pathInfo;
+//
+		//if (!SDL_GetPathInfo(path, &pathInfo) || pathInfo.type != SDL_PATHTYPE_FILE) {
+//			sprintf(path, "%s", MxOmni::GetCD());
+//
+//			if (path[strlen(path) - 1] != '\\') {
+//				strcat(path, "\\");
+//			}
+//
+//			strcat(path, filename);
+//			MxString::MapPathToFilesystem(path);
+//
+//			if (!SDL_GetPathInfo(path, &pathInfo) || pathInfo.type != SDL_PATHTYPE_FILE) {
+//				goto done;
+//			}
+//		}
 
 		if (storage.Open(path, LegoFile::c_read) == FAILURE) {
 			goto done;

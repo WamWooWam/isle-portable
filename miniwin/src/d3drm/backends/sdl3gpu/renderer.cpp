@@ -6,7 +6,7 @@
 #include "meshutils.h"
 #include "miniwin.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <cstddef>
 
 struct ScopedSurface {

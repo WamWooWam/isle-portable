@@ -10,7 +10,7 @@
 #include "mxticklemanager.h"
 #include "mxticklethread.h"
 
-#include <SDL3/SDL_log.h>
+#include <SDL2/SDL_log.h>
 
 DECOMP_SIZE_ASSERT(MxVideoManager, 0x64)
 

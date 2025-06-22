@@ -5,7 +5,7 @@
 #include "ddraw_impl.h"
 
 #include <GLES2/gl2.h>
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 DEFINE_GUID(OpenGLES2_GUID, 0x682656F3, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04);

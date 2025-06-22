@@ -3,7 +3,7 @@
 
 #include "mxtypes.h"
 
-#include <SDL3/SDL_mutex.h>
+#include <SDL2/SDL_mutex.h>
 
 // VTABLE: LEGO1 0x100dccf0
 // SIZE 0x08
@@ -20,7 +20,7 @@ public:
 	void Release();
 
 private:
-	SDL_Semaphore* m_semaphore;
+	SDL_semaphore* m_semaphore;
 };
 
 #endif // MXSEMAPHORE_H

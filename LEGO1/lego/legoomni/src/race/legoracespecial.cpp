@@ -8,7 +8,7 @@
 #include "mxmisc.h"
 #include "mxvariabletable.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <vec.h>
 
 // File name verified by BETA10 0x100cedf7

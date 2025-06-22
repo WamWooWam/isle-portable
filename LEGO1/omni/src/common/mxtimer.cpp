@@ -1,6 +1,6 @@
 #include "mxtimer.h"
 
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_timer.h>
 
 // GLOBAL: LEGO1 0x10101414
 // GLOBAL: BETA10 0x10201f84

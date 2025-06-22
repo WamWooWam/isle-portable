@@ -16,7 +16,7 @@
 #include "mxutilities.h"
 #include "mxvariabletable.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <mxdebug.h>
 #include <vec.h>
 

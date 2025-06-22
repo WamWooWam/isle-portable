@@ -19,8 +19,8 @@
 #include "tgl/d3drm/impl.h"
 #include "viewmanager/viewroi.h"
 
-#include <SDL3/SDL_log.h>
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_log.h>
+#include <SDL2/SDL_stdinc.h>
 #include <stdio.h>
 
 DECOMP_SIZE_ASSERT(LegoVideoManager, 0x590)

@@ -10,7 +10,7 @@
 #include "mxstillpresenter.h"
 #include "mxtransitionmanager.h"
 
-#include <SDL3/SDL_log.h>
+#include <SDL2/SDL_log.h>
 
 DECOMP_SIZE_ASSERT(HistoryBook, 0x3e4)
 
@@ -195,7 +195,7 @@ void HistoryBook::ReadyWorld()
 
 				if (index >= sizeOfArray(m_intAlphabet) || !m_intAlphabet[index]) {
 					SDL_Log("Warning: international character not present in current game. Falling back to X");
-					return &m_alphabet[SDLK_X - SDLK_A];
+					return &m_alphabet[SDLK_x - SDLK_a];
 				}
 
 				return &m_intAlphabet[index];

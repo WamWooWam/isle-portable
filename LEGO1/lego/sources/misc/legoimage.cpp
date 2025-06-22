@@ -58,15 +58,15 @@ LegoImage::LegoImage()
 // FUNCTION: LEGO1 0x100995a0
 LegoImage::LegoImage(LegoU32 p_width, LegoU32 p_height)
 {
-	m_surface = SDL_CreateSurface(p_width, p_height, SDL_PIXELFORMAT_INDEX8);
+	m_surface = SDL_CreateRGBSurfaceWithFormat(0, p_width, p_height, 8, SDL_PIXELFORMAT_INDEX8);
 	m_palette = NULL;
 }
 
 // FUNCTION: LEGO1 0x100995f0
 LegoImage::~LegoImage()
 {
-	SDL_DestroySurface(m_surface);
-	SDL_DestroyPalette(m_palette);
+	SDL_FreeSurface(m_surface);
+	SDL_FreePalette(m_palette);
 }
 
 // FUNCTION: LEGO1 0x10099610
@@ -84,9 +84,9 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 		return result;
 	}
 	if (m_palette) {
-		SDL_DestroyPalette(m_palette);
+		SDL_FreePalette(m_palette);
 	}
-	m_palette = SDL_CreatePalette(count);
+	m_palette = SDL_AllocPalette(count);
 	for (LegoU32 i = 0; i < count; i++) {
 		LegoPaletteEntry paletteEntry;
 		if ((result = paletteEntry.Read(p_storage)) != SUCCESS) {
@@ -95,9 +95,9 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 		m_palette->colors[i] = paletteEntry.GetColor();
 	}
 	if (m_surface) {
-		SDL_DestroySurface(m_surface);
+		SDL_FreeSurface(m_surface);
 	}
-	m_surface = SDL_CreateSurface(width, height, SDL_PIXELFORMAT_INDEX8);
+	m_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 8, SDL_PIXELFORMAT_INDEX8);
 	if ((result = p_storage->Read(m_surface->pixels, width * height)) != SUCCESS) {
 		return result;
 	}
@@ -107,7 +107,7 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 
 		if (height < width) {
 			LegoU32 aspect = width / height;
-			newSurface = SDL_CreateSurface(width, width, SDL_PIXELFORMAT_INDEX8);
+			newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 8, SDL_PIXELFORMAT_INDEX8);
 			LegoU8* src = (LegoU8*) m_surface->pixels;
 			LegoU8* dst = (LegoU8*) newSurface->pixels;
 
@@ -125,7 +125,7 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 		}
 		else {
 			LegoU32 aspect = height / width;
-			newSurface = SDL_CreateSurface(height, height, SDL_PIXELFORMAT_INDEX8);
+			newSurface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 8, SDL_PIXELFORMAT_INDEX8);
 			LegoU8* src = (LegoU8*) m_surface->pixels;
 			LegoU8* dst = (LegoU8*) newSurface->pixels;
 
@@ -145,7 +145,7 @@ LegoResult LegoImage::Read(LegoStorage* p_storage, LegoU32 p_square)
 			width = height;
 		}
 
-		SDL_DestroySurface(m_surface);
+		SDL_FreeSurface(m_surface);
 		m_surface = newSurface;
 	}
 

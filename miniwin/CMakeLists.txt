@@ -22,8 +22,6 @@ add_library(miniwin STATIC EXCLUDE_FROM_ALL
   src/internal/meshutils.cpp
 
   # D3DRM backends
-  src/d3drm/backends/sdl3gpu/renderer.cpp
-  src/d3drm/backends/sdl3gpu/shaders/generated/ShaderIndex.cpp
   src/d3drm/backends/software/renderer.cpp
 )
 

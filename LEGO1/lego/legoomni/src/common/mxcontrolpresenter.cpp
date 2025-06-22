@@ -9,8 +9,8 @@
 #include "mxtimer.h"
 #include "mxutilities.h"
 
-#include <SDL3/SDL_log.h>
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_log.h>
+#include <SDL2/SDL_stdinc.h>
 #include <assert.h>
 
 DECOMP_SIZE_ASSERT(MxControlPresenter, 0x5c)

@@ -4,8 +4,8 @@
 #include "misc.h"
 #include "mxomni.h"
 
-#include <SDL3/SDL_filesystem.h>
-#include <SDL3/SDL_log.h>
+#include <SDL2/SDL_filesystem.h>
+#include <SDL2/SDL_log.h>
 #include <emscripten/wasmfs.h>
 
 static backend_t opfs = nullptr;

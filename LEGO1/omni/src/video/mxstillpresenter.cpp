@@ -12,7 +12,7 @@
 #include "mxutilities.h"
 #include "mxvideomanager.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 DECOMP_SIZE_ASSERT(MxStillPresenter, 0x6c);
 

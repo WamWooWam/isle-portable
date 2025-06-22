@@ -16,7 +16,9 @@
 #ifdef _WIN32
 #include "d3drmrenderer_directx9.h"
 #endif
+#ifdef USE_SDL3GPU
 #include "d3drmrenderer_sdl3gpu.h"
+#endif
 #include "d3drmrenderer_software.h"
 #include "d3drmtexture_impl.h"
 #include "d3drmviewport_impl.h"
@@ -24,7 +26,7 @@
 #include "ddsurface_impl.h"
 #include "miniwin.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 Direct3DRMPickedArrayImpl::Direct3DRMPickedArrayImpl(const PickRecord* inputPicks, size_t count)
 {
@@ -143,29 +145,32 @@ HRESULT Direct3DRMImpl::CreateDeviceFromSurface(
 	DDSDesc.dwSize = sizeof(DDSURFACEDESC);
 	surface->GetSurfaceDesc(&DDSDesc);
 
-	Direct3DRMRenderer* renderer;
+	Direct3DRMRenderer* renderer = nullptr;
+#if USE_SDL3GPU
 	if (SDL_memcmp(&guid, &SDL3_GPU_GUID, sizeof(GUID)) == 0) {
 		renderer = Direct3DRMSDL3GPURenderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
-	else if (SDL_memcmp(&guid, &SOFTWARE_GUID, sizeof(GUID)) == 0) {
+#endif
+	if (SDL_memcmp(&guid, &SOFTWARE_GUID, sizeof(GUID)) == 0) {
 		renderer = new Direct3DRMSoftwareRenderer(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #ifdef USE_OPENGLES2
-	else if (SDL_memcmp(&guid, &OpenGLES2_GUID, sizeof(GUID)) == 0) {
+	if (SDL_memcmp(&guid, &OpenGLES2_GUID, sizeof(GUID)) == 0) {
 		renderer = OpenGLES2Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
 #ifdef USE_OPENGL1
-	else if (SDL_memcmp(&guid, &OpenGL1_GUID, sizeof(GUID)) == 0) {
+	if (SDL_memcmp(&guid, &OpenGL1_GUID, sizeof(GUID)) == 0) {
 		renderer = OpenGL1Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
 #ifdef _WIN32
-	else if (SDL_memcmp(&guid, &DirectX9_GUID, sizeof(GUID)) == 0) {
+	if (SDL_memcmp(&guid, &DirectX9_GUID, sizeof(GUID)) == 0) {
 		renderer = DirectX9Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
-	else {
+	
+	if (renderer == nullptr) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Device GUID not recognized");
 		return E_NOINTERFACE;
 	}

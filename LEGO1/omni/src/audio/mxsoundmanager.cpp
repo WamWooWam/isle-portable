@@ -55,7 +55,7 @@ void MxSoundManager::Destroy(MxBool p_fromDestructor)
 	m_criticalSection.Enter();
 
 	if (m_stream) {
-		SDL_DestroyAudioStream(m_stream);
+	//	SDL_DestroyAudioStream(m_stream);
 	}
 
 	m_engine.Destroy(ma_engine_uninit);
@@ -83,40 +83,40 @@ MxResult MxSoundManager::Create(MxU32 p_frequencyMS, MxBool p_createThread)
 	m_criticalSection.Enter();
 	locked = TRUE;
 
-	engineConfig = ma_engine_config_init();
-	engineConfig.noDevice = MA_TRUE;
-	engineConfig.channels = MxOmni::IsSound3D() ? 2 : 1;
-	engineConfig.sampleRate = g_sampleRate;
-
-	if (m_engine.Init(ma_engine_init, &engineConfig) != MA_SUCCESS) {
-		goto done;
-	}
-
-	SDL_AudioSpec spec;
-	SDL_zero(spec);
-	spec.freq = ma_engine_get_sample_rate(m_engine);
-	spec.format = SDL_AUDIO_F32;
-	spec.channels = ma_engine_get_channels(m_engine);
-
-	if ((m_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, &AudioStreamCallback, this)) ==
-		NULL) {
-		goto done;
-	}
-
-	SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(m_stream));
-
-	if (p_createThread) {
-		m_thread = new MxTickleThread(this, p_frequencyMS);
-
-		if (!m_thread || m_thread->Start(0, 0) != SUCCESS) {
-			goto done;
-		}
-	}
-	else {
-		TickleManager()->RegisterClient(this, p_frequencyMS);
-	}
-
-	status = SUCCESS;
+	//engineConfig = ma_engine_config_init();
+//	engineConfig.noDevice = MA_TRUE;
+//	engineConfig.channels = MxOmni::IsSound3D() ? 2 : 1;
+//	engineConfig.sampleRate = g_sampleRate;
+//
+//	if (m_engine.Init(ma_engine_init, &engineConfig) != MA_SUCCESS) {
+//		goto done;
+//	}
+//
+//	SDL_AudioSpec spec;
+//	SDL_zero(spec);
+//	spec.freq = ma_engine_get_sample_rate(m_engine);
+//	spec.format = SDL_AUDIO_F32;
+//	spec.channels = ma_engine_get_channels(m_engine);
+//
+//	if ((m_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, &AudioStreamCallback, this)) ==
+//		NULL) {
+//		goto done;
+//	}
+//
+//	SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(m_stream));
+//
+//	if (p_createThread) {
+//		m_thread = new MxTickleThread(this, p_frequencyMS);
+//
+//		if (!m_thread || m_thread->Start(0, 0) != SUCCESS) {
+//			goto done;
+//		}
+//	}
+//	else {
+//		TickleManager()->RegisterClient(this, p_frequencyMS);
+//	}
+//
+//	status = SUCCESS;
 
 done:
 	if (status != SUCCESS) {
@@ -145,7 +145,7 @@ void MxSoundManager::AudioStreamCallback(
 	ma_uint64 framesRead;
 
 	if (ma_engine_read_pcm_frames(manager->m_engine, g_buffer.data(), bufferSizeInFrames, &framesRead) == MA_SUCCESS) {
-		SDL_PutAudioStreamData(manager->m_stream, g_buffer.data(), framesRead * bytesPerFrame);
+		//SDL_PutAudioStreamData(manager->m_stream, g_buffer.data(), framesRead * bytesPerFrame);
 	}
 }
 

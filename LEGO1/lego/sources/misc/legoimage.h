@@ -3,7 +3,7 @@
 
 #include "legotypes.h"
 
-#include <SDL3/SDL_surface.h>
+#include <SDL2/SDL_surface.h>
 
 class LegoStorage;
 
@@ -39,7 +39,7 @@ public:
 	SDL_Palette* GetPalette() const { return m_palette; }
 	void SetPalette(SDL_Palette* p_palette)
 	{
-		SDL_DestroyPalette(m_palette);
+		SDL_FreePalette(m_palette);
 		m_palette = p_palette;
 	}
 	void SetPaletteEntry(LegoU32 p_i, LegoPaletteEntry& p_paletteEntry)

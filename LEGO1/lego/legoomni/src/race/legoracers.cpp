@@ -19,7 +19,7 @@
 #include "mxvariabletable.h"
 #include "raceskel.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <stdio.h>
 
 DECOMP_SIZE_ASSERT(EdgeReference, 0x08)

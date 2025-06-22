@@ -4,7 +4,7 @@
 #include "d3drmtexture_impl.h"
 #include "ddraw_impl.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <cstddef>
 #include <vector>
 
@@ -64,7 +64,7 @@ private:
 	DWORD m_width;
 	DWORD m_height;
 	SDL_Palette* m_palette;
-	const SDL_PixelFormatDetails* m_format;
+	const SDL_PixelFormat* m_format;
 	int m_bytesPerPixel;
 	std::vector<SceneLight> m_lights;
 	std::vector<TextureCache> m_textures;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 #define LOG_CATEGORY_MINIWIN (SDL_LOG_CATEGORY_CUSTOM)
 
@@ -26,5 +26,5 @@
 
 #define MINIWIN_TRACE(...)                                                                                             \
 	do {                                                                                                               \
-		SDL_LogTrace(LOG_CATEGORY_MINIWIN, __VA_ARGS__);                                                               \
+		SDL_LogDebug(LOG_CATEGORY_MINIWIN, __VA_ARGS__);                                                               \
 	} while (0)

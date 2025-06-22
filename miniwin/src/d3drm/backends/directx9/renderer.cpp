@@ -5,7 +5,7 @@
 #include "meshutils.h"
 #include "structs.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <cstring>
 #include <vector>

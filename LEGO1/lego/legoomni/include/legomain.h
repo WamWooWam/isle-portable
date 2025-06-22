@@ -7,8 +7,8 @@
 #include "mxdsaction.h"
 #include "mxomni.h"
 
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_timer.h>
 
 class Isle;
 class LegoAnimationManager;
@@ -191,8 +191,8 @@ public:
 	void CloseMainWindow()
 	{
 		SDL_QuitEvent quit;
-		quit.type = SDL_EVENT_QUIT;
-		quit.timestamp = SDL_GetTicksNS();
+		quit.type = SDL_QUIT;
+		quit.timestamp = SDL_GetTicks();
 
 		SDL_Event event;
 		event.quit = quit;

@@ -7,8 +7,8 @@
 #include "mathutils.h"
 #include "miniwin.h"
 
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_stdinc.h>
 #include <cassert>
 #include <float.h>
 #include <functional>
@@ -357,8 +357,8 @@ HRESULT Direct3DRMViewportImpl::Clear()
 	uint8_t g = (m_backgroundColor >> 8) & 0xFF;
 	uint8_t b = m_backgroundColor & 0xFF;
 
-	Uint32 color = SDL_MapRGB(SDL_GetPixelFormatDetails(DDBackBuffer->format), nullptr, r, g, b);
-	SDL_FillSurfaceRect(DDBackBuffer, nullptr, color);
+	Uint32 color = SDL_MapRGB(DDBackBuffer->format, r, g, b);
+	SDL_FillRect(DDBackBuffer, nullptr, color);
 
 	return DD_OK;
 }

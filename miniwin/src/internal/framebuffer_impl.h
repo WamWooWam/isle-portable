@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <ddsurface_impl.h>
 #include <miniwin/ddraw.h>
 

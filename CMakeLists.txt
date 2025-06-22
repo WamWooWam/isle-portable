@@ -51,7 +51,7 @@ message(STATUS "Internal miniwin:       ${ISLE_MINIWIN}")
 message(STATUS "Isle debugging:         ${ISLE_DEBUG}")
 message(STATUS "Compile shaders:        ${ISLE_COMPILE_SHADERS}")
 
-    include(FetchContent)
+include(FetchContent)
 if (DOWNLOAD_DEPENDENCIES)
     # FetchContent downloads and configures dependencies
     message(STATUS "Fetching SDL3 and iniparser. This might take a while...")
@@ -66,8 +66,13 @@ else()
     # find_package looks for already-installed system packages.
     # Configure with `-DCMAKE_PREFIX_PATH="/path/to/package1;/path/to/package2"`
     # to add search paths.
-    find_package(SDL2 CONFIG REQUIRED)
-		
+    # find_package(SDL2 CONFIG REQUIRED)
+
+    add_library(SDL2 INTERFACE)
+    target_include_directories(SDL2 INTERFACE
+	/usr/local/include
+    )
+	
     FetchContent_Declare(
         iniparser
         GIT_REPOSITORY "https://gitlab.com/iniparser/iniparser.git"
@@ -139,6 +144,7 @@ target_include_directories(Vec::Vec INTERFACE "${CMAKE_SOURCE_DIR}/3rdparty/vec"
 add_library(lego1
   LEGO1/main.cpp
 )
+
 target_precompile_headers(lego1 PRIVATE "LEGO1/lego1_pch.h")
 set_property(TARGET lego1 PROPERTY DEFINE_SYMBOL "LEGO1_DLL")
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/util>")
@@ -148,7 +154,7 @@ target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/L
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include>")
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include/actions>")
 target_link_libraries(lego1 PUBLIC SDL2)
-target_link_libraries(lego1 PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5>)
+target_link_libraries(lego1 PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5> atomic /Users/thomasmay/Projects/SDL2-2.0.8/build/.libs/libSDL2-2.0.0.dylib)
 if(WIN32)
   set_property(TARGET lego1 PROPERTY PREFIX "")
 endif()
@@ -337,7 +343,7 @@ target_include_directories(lego1 PRIVATE "${CMAKE_SOURCE_DIR}/LEGO1/omni/include
 if (WIN32)
   target_link_libraries(lego1 INTERFACE winmm)
 endif()
-target_link_libraries(lego1 PRIVATE libsmacker miniaudio)
+target_link_libraries(lego1 PRIVATE libsmacker miniaudio sdl3_backport)
 target_include_directories(lego1 PUBLIC $<BUILD_INTERFACE:$<TARGET_PROPERTY:miniaudio,INTERFACE_INCLUDE_DIRECTORIES>>)
 
 # lego1_impl sources
@@ -478,7 +484,7 @@ if (ISLE_BUILD_APP)
   target_link_libraries(isle PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5>)
 
   # Link SDL and iniparser
-  target_link_libraries(isle PRIVATE SDL2 iniparser-static)
+  target_link_libraries(isle PRIVATE SDL2 iniparser-static sdl3_backport atomic /Users/thomasmay/Projects/SDL2-2.0.8/build/.libs/libSDL2-2.0.0.dylib)
 
   # Allow unconditional include of miniwin/miniwindevice.h
   target_link_libraries(isle PRIVATE miniwin-headers)

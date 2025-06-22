@@ -2,7 +2,7 @@
 
 #include "decomp.h"
 
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_timer.h>
 
 DECOMP_SIZE_ASSERT(MxThread, 0x1c)
 
@@ -27,16 +27,19 @@ MxResult MxThread::Start(MxS32 p_stackSize, MxS32 p_flag)
 	MxResult result = FAILURE;
 
 	if (m_semaphore.Init(0, 1) == SUCCESS) {
-		const SDL_PropertiesID props = SDL_CreateProperties();
-		SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_ENTRY_FUNCTION_POINTER, (void*) MxThread::ThreadProc);
-		SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_USERDATA_POINTER, this);
-		SDL_SetNumberProperty(props, SDL_PROP_THREAD_CREATE_STACKSIZE_NUMBER, p_stackSize * 4);
-
-		if ((m_thread = SDL_CreateThreadWithProperties(props))) {
-			result = SUCCESS;
-		}
-
-		SDL_DestroyProperties(props);
+		//const SDL_PropertiesID props = SDL_CreateProperties();
+//		SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_ENTRY_FUNCTION_POINTER, (void*) MxThread::ThreadProc);
+//		SDL_SetPointerProperty(props, SDL_PROP_THREAD_CREATE_USERDATA_POINTER, this);
+//		SDL_SetNumberProperty(props, SDL_PROP_THREAD_CREATE_STACKSIZE_NUMBER, p_stackSize * 4);
+//
+		//		if ((m_thread = SDL_CreateThreadWithProperties(props))) {
+		//			result = SUCCESS;
+		//		}
+//
+//		SDL_DestroyProperties(props);
+		if ((m_thread = SDL_CreateThread(&MxThread::ThreadProc, "MxThread", this))) {
+					result = SUCCESS;
+				}
 	}
 
 	return result;

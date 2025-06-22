@@ -26,7 +26,7 @@
 #include "realtime/realtimeview.h"
 #include "viewmanager/viewmanager.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <vec.h>
 
 DECOMP_SIZE_ASSERT(LegoNavController, 0x70)
@@ -111,10 +111,10 @@ LegoAnimationManager::PlayMode g_unk0x100f66bc = LegoAnimationManager::e_unk2;
 // GLOBAL: LEGO1 0x100f66c0
 SDL_Keycode g_debugPassword[] = {
 	// "OGEL"
-	SDLK_O,
-	SDLK_G,
-	SDLK_E,
-	SDLK_L,
+	SDLK_o,
+	SDLK_g,
+	SDLK_e,
+	SDLK_l,
 	0,
 };
 
@@ -683,7 +683,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 		case SDLK_SPACE: // Interrupt/end animations or free navigation
 			AnimationManager()->FUN_10061010(TRUE);
 			break;
-		case SDLK_Z: { // Make nearby plants "dance"
+		case SDLK_z: { // Make nearby plants "dance"
 			LegoOmni* omni = Lego();
 
 			if (omni->GetCurrentWorld() != NULL && omni->GetCurrentWorld()->GetWorldId() == LegoOmni::e_act1) {
@@ -900,7 +900,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 						LegoOmni::GetInstance()->Start(&action);
 					}
 					break;
-				case SDLK_A:
+				case SDLK_a:
 					if (g_animationCalcStep == 1) {
 						Lego()->m_unk0x13c = TRUE;
 						AnimationManager()->FUN_10060570(TRUE);
@@ -916,22 +916,22 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 						}
 					}
 					break;
-				case SDLK_C:
+				case SDLK_c:
 					g_locationCalcStep = 1;
 					break;
-				case SDLK_D:
+				case SDLK_d:
 					m_unk0x60 = -1.0;
 					break;
-				case SDLK_F:
+				case SDLK_f:
 					RealtimeView::SetUserMaxLOD(0.0);
 					break;
-				case SDLK_G:
+				case SDLK_g:
 					g_switchAct = TRUE;
 					break;
-				case SDLK_H:
+				case SDLK_h:
 					RealtimeView::SetUserMaxLOD(5.0);
 					break;
-				case SDLK_I: {
+				case SDLK_i: {
 					LegoROI* roi = VideoManager()->GetViewROI();
 					MxMatrix mat;
 					mat.SetIdentity();
@@ -939,7 +939,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					roi->WrappedUpdateWorldDataWithTransform(mat);
 					break;
 				}
-				case SDLK_J: {
+				case SDLK_j: {
 					LegoROI* roi = VideoManager()->GetViewROI();
 					MxMatrix mat;
 					mat.SetIdentity();
@@ -947,7 +947,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					roi->WrappedUpdateWorldDataWithTransform(mat);
 					break;
 				}
-				case SDLK_K: {
+				case SDLK_k: {
 					MxMatrix mat;
 					LegoROI* roi = LegoOmni::GetInstance()->GetVideoManager()->GetViewROI();
 					mat.SetIdentity();
@@ -955,10 +955,10 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					roi->WrappedUpdateWorldDataWithTransform(mat);
 					break;
 				}
-				case SDLK_L:
+				case SDLK_l:
 					g_changeLight = TRUE;
 					break;
-				case SDLK_M: {
+				case SDLK_m: {
 					LegoROI* roi = LegoOmni::GetInstance()->GetVideoManager()->GetViewROI();
 					MxMatrix mat;
 					mat.SetIdentity();
@@ -966,12 +966,12 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					roi->WrappedUpdateWorldDataWithTransform(mat);
 					break;
 				}
-				case SDLK_N:
+				case SDLK_n:
 					if (VideoManager()) {
 						VideoManager()->SetRender3D(!VideoManager()->GetRender3D());
 					}
 					break;
-				case SDLK_P:
+				case SDLK_p:
 					if (!g_resetPlants) {
 						PlantManager()->LoadWorldInfo(LegoOmni::e_act1);
 						g_resetPlants = TRUE;
@@ -981,14 +981,14 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 						g_resetPlants = FALSE;
 					}
 					break;
-				case SDLK_S:
+				case SDLK_s:
 					g_enableMusic = g_enableMusic == FALSE;
 					BackgroundAudioManager()->Enable(g_enableMusic);
 					break;
-				case SDLK_U:
+				case SDLK_u:
 					m_unk0x60 = 1.0;
 					break;
-				case SDLK_V:
+				case SDLK_v:
 					if (g_nextAnimation > 0 && g_animationCalcStep == 0) {
 						AnimationManager()->FUN_10061010(FALSE);
 					}
@@ -1000,7 +1000,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					g_nextAnimation = 0;
 					g_animationCalcStep = 1;
 					break;
-				case SDLK_W: {
+				case SDLK_w: {
 					MxMatrix mat;
 					LegoROI* roi = LegoOmni::GetInstance()->GetVideoManager()->GetViewROI();
 					const float* position = roi->GetWorldPosition();
@@ -1015,7 +1015,7 @@ MxLong LegoNavController::Notify(MxParam& p_param)
 					);
 					break;
 				}
-				case SDLK_X:
+				case SDLK_x:
 					RealtimeView::SetUserMaxLOD(3.6);
 					break;
 				case SDLK_KP_MULTIPLY: {

@@ -4,7 +4,7 @@
 #include "mxnotificationparam.h"
 #include "mxtypes.h"
 
-#include <SDL3/SDL_keycode.h>
+#include <SDL2/SDL_keycode.h>
 #include <stdlib.h>
 
 class LegoROI;

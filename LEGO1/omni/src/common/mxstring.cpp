@@ -3,9 +3,9 @@
 #include "decomp.h"
 #include "mxomni.h"
 
-#include <SDL3/SDL_log.h>
-#include <SDL3/SDL_platform_defines.h>
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_log.h>
+// #include <SDL2/SDL_platform_defines.h>
+#include <SDL2/SDL_stdinc.h>
 #include <stdlib.h>
 #include <string.h>
 

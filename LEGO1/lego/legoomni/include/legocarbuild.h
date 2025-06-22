@@ -6,7 +6,7 @@
 #include "legoworld.h"
 #include "mxgeometry/mxquaternion.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 
 class LegoCarBuildAnimPresenter;
 class LegoControlManagerNotificationParam;

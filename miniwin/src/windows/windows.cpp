@@ -1,7 +1,7 @@
 #include "miniwin.h"
 #include "miniwin/ddraw.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 ULONG IUnknown::AddRef()
@@ -206,8 +206,8 @@ LONG SetWindowLong(HWND hWnd, int nIndex, LONG dwNewLong)
 {
 	SDL_Window* sdlWindow = reinterpret_cast<SDL_Window*>(hWnd);
 	if (nIndex == GWL_STYLE) {
-		SDL_SetWindowBordered(sdlWindow, (dwNewLong & WS_CAPTION) != 0);
-		SDL_SetWindowResizable(sdlWindow, (dwNewLong & WS_THICKFRAME) != 0);
+		SDL_SetWindowBordered(sdlWindow, (SDL_bool)((dwNewLong & WS_CAPTION) != 0));
+		SDL_SetWindowResizable(sdlWindow, (SDL_bool)((dwNewLong & WS_THICKFRAME) != 0));
 
 		return dwNewLong;
 	}

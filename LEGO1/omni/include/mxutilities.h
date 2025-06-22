@@ -4,7 +4,7 @@
 #include "lego1_export.h"
 #include "mxtypes.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <string.h>
 
 struct LegoSdlEvents {

@@ -18,7 +18,7 @@
 #include "mxtransitionmanager.h"
 #include "mxvariabletable.h"
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL2/SDL_stdinc.h>
 #include <stdio.h>
 
 DECOMP_SIZE_ASSERT(DuneBuggy, 0x16c)

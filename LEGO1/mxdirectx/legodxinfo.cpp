@@ -1,6 +1,6 @@
 #include "legodxinfo.h"
 
-#include <SDL3/SDL_cpuinfo.h>
+#include <SDL2/SDL_cpuinfo.h>
 #include <assert.h>
 #include <stdio.h> // for vsprintf
 

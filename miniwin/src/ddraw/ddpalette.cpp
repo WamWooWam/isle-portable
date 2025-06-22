@@ -1,17 +1,17 @@
 #include "ddpalette_impl.h"
 #include "miniwin/ddraw.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 DirectDrawPaletteImpl::DirectDrawPaletteImpl(LPPALETTEENTRY lpColorTable)
 {
-	m_palette = SDL_CreatePalette(256);
+	m_palette = SDL_AllocPalette(256);
 	SetEntries(0, 0, 256, lpColorTable);
 }
 
 DirectDrawPaletteImpl::~DirectDrawPaletteImpl()
 {
-	SDL_DestroyPalette(m_palette);
+	SDL_FreePalette(m_palette);
 }
 
 HRESULT DirectDrawPaletteImpl::GetEntries(DWORD dwFlags, DWORD dwBase, DWORD dwNumEntries, LPPALETTEENTRY lpEntries)

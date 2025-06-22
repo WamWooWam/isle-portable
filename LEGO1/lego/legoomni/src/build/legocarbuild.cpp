@@ -30,8 +30,8 @@
 #include "racecar_actions.h"
 #include "scripts.h"
 
-#include <SDL3/SDL_stdinc.h>
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_timer.h>
 #include <isle.h>
 #include <stdio.h>
 #include <vec.h>

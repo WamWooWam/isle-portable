@@ -2,7 +2,7 @@
 
 #include "miniwin/d3drm.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 template <typename T>

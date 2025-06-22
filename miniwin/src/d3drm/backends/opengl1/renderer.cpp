@@ -6,7 +6,7 @@
 #include "mathutils.h"
 #include "meshutils.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <cstring>
 #include <vector>
@@ -20,7 +20,7 @@ Direct3DRMRenderer* OpenGL1Renderer::Create(DWORD width, DWORD height)
 	SDL_Window* window = DDWindow;
 	bool testWindow = false;
 	if (!window) {
-		window = SDL_CreateWindow("OpenGL 1.2 test", width, height, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("OpenGL 1.2 test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 		testWindow = true;
 	}
 
@@ -98,13 +98,13 @@ OpenGL1Renderer::OpenGL1Renderer(
 )
 	: m_width(width), m_height(height), m_context(context), m_fbo(fbo), m_colorTex(colorTex), m_depthRb(depthRb)
 {
-	m_renderedImage = SDL_CreateSurface(m_width, m_height, SDL_PIXELFORMAT_ABGR8888);
+	m_renderedImage = SDL_CreateRGBSurfaceWithFormat(0, m_width, m_height, 32, SDL_PIXELFORMAT_ABGR8888);
 	m_useVBOs = GLEW_ARB_vertex_buffer_object;
 }
 
 OpenGL1Renderer::~OpenGL1Renderer()
 {
-	SDL_DestroySurface(m_renderedImage);
+	SDL_FreeSurface(m_renderedImage);
 	glDeleteFramebuffers(1, &m_fbo);
 	glDeleteRenderbuffers(1, &m_depthRb);
 	glDeleteTextures(1, &m_colorTex);
@@ -161,12 +161,15 @@ Uint32 OpenGL1Renderer::GetTextureId(IDirect3DRMTexture* iTexture)
 				glGenTextures(1, &tex.glTextureId);
 				glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
 
-				SDL_Surface* surf = SDL_ConvertSurface(surface->m_surface, SDL_PIXELFORMAT_ABGR8888);
+				SDL_PixelFormat* fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
+				SDL_Surface* surf = SDL_ConvertSurface(surface->m_surface, fmt, 0);
 				if (!surf) {
+					SDL_FreeFormat(fmt);
 					return NO_TEXTURE_ID;
 				}
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, surf->w, surf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels);
-				SDL_DestroySurface(surf);
+				SDL_FreeSurface(surf);
+				SDL_FreeFormat(fmt);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -179,13 +182,16 @@ Uint32 OpenGL1Renderer::GetTextureId(IDirect3DRMTexture* iTexture)
 	GLuint texId;
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
-
-	SDL_Surface* surf = SDL_ConvertSurface(surface->m_surface, SDL_PIXELFORMAT_ABGR8888);
+	
+	SDL_PixelFormat* fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ABGR8888);
+	SDL_Surface* surf = SDL_ConvertSurface(surface->m_surface, fmt, 0);
 	if (!surf) {
+		SDL_FreeFormat(fmt);
 		return NO_TEXTURE_ID;
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, surf->w, surf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels);
-	SDL_DestroySurface(surf);
+	SDL_FreeSurface(surf);
+	SDL_FreeFormat(fmt);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

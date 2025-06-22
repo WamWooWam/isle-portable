@@ -12,7 +12,7 @@
 #include "mxticklemanager.h"
 #include "mxvideopresenter.h"
 
-#include <SDL3/SDL_timer.h>
+#include <SDL2/SDL_timer.h>
 
 DECOMP_SIZE_ASSERT(MxTransitionManager, 0x900)
 

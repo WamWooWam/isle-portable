@@ -1,6 +1,6 @@
 #include "mxdirect3d.h"
 
-#include <SDL3/SDL.h> // for SDL_Log
+#include <SDL2/SDL.h> // for SDL_Log
 #include <assert.h>
 
 DECOMP_SIZE_ASSERT(MxDirect3D, 0x894)

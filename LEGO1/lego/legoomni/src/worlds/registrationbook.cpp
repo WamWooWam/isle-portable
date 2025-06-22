@@ -29,7 +29,7 @@
 #include "regbook_actions.h"
 #include "scripts.h"
 
-#include <SDL3/SDL_log.h>
+#include <SDL2/SDL_log.h>
 
 DECOMP_SIZE_ASSERT(RegistrationBook, 0x2d0)
 
@@ -179,8 +179,8 @@ MxLong RegistrationBook::HandleKeyPress(SDL_Keycode p_key)
 	SDL_Keycode key = p_key;
 
 	MxStillPresenter** intoAlphabet = [this, key]() -> MxStillPresenter** {
-		if (key >= SDLK_A && key <= SDLK_Z) {
-			return &m_alphabet[key - SDLK_A];
+		if (key >= SDLK_QUOTE && key <= SDLK_z) {
+			return &m_alphabet[key - SDLK_a];
 		}
 
 		for (int i = 0; i < sizeOfArray(m_intAlphabet); i++) {
@@ -212,8 +212,8 @@ MxLong RegistrationBook::HandleKeyPress(SDL_Keycode p_key)
 			}
 
 			m_unk0x280.m_letters[m_unk0x280.m_cursorPos] =
-				key >= SDLK_A && key <= SDLK_Z
-					? key - SDLK_A
+				key >= SDLK_a && key <= SDLK_z
+					? key - SDLK_a
 					: (intoAlphabet - m_intAlphabet) + sizeOfArray(m_alphabet) - m_intAlphabetOffset;
 			m_unk0x280.m_cursorPos++;
 		}
@@ -276,7 +276,7 @@ MxLong RegistrationBook::HandleControl(LegoControlManagerNotificationParam& p_pa
 				}
 
 				if (buttonId < 27) {
-					HandleKeyPress(SDLK_A + buttonId - 1);
+					HandleKeyPress(SDLK_a + buttonId - 1);
 				}
 				else if (intChar) {
 					HandleKeyPress((SDL_Keycode) intChar->m_character);
@@ -503,7 +503,7 @@ void RegistrationBook::ReadyWorld()
 
 					if (index >= sizeOfArray(m_intAlphabet) || !m_intAlphabet[index]) {
 						SDL_Log("Warning: international character not present in current game. Falling back to X");
-						return &m_alphabet[SDLK_X - SDLK_A];
+						return &m_alphabet[SDLK_x - SDLK_a];
 					}
 
 					return &m_intAlphabet[index];

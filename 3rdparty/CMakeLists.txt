@@ -13,6 +13,7 @@ else()
         miniaudio/extras/miniaudio_split/miniaudio.c
     )
     target_include_directories(miniaudio PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/miniaudio/extras/miniaudio_split")
+    target_link_libraries(miniaudio atomic)
 endif()
 
 # Disable most features since we don't need them.
@@ -71,3 +72,13 @@ add_library(imgui STATIC
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 target_link_libraries(imgui PUBLIC SDL2)
 set_property(TARGET imgui PROPERTY CXX_CLANG_TIDY "")
+ 
+set(sdl3_backport_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdl3_backport")
+
+add_library(sdl3_backport STATIC
+    ${sdl3_backport_SOURCE_DIR}/SDL_iostream.c
+)
+target_include_directories(sdl3_backport PUBLIC ${sdl3_backport_SOURCE_DIR})
+target_link_libraries(sdl3_backport PUBLIC SDL2)
+set_property(TARGET sdl3_backport PROPERTY CXX_CLANG_TIDY "")
+

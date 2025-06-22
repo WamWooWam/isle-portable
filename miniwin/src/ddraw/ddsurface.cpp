@@ -5,17 +5,20 @@
 
 #include <assert.h>
 
-DirectDrawSurfaceImpl::DirectDrawSurfaceImpl(int width, int height, SDL_PixelFormat format)
+DirectDrawSurfaceImpl::DirectDrawSurfaceImpl(int width, int height, int format)
 {
-	m_surface = SDL_CreateSurface(width, height, format);
+	SDL_PixelFormat* fmt = SDL_AllocFormat(format);
+	
+	m_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, fmt->BitsPerPixel, format);
 	if (!m_surface) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create surface: %s", SDL_GetError());
 	}
+	SDL_FreeFormat(fmt);
 }
 
 DirectDrawSurfaceImpl::~DirectDrawSurfaceImpl()
 {
-	SDL_DestroySurface(m_surface);
+	SDL_FreeSurface(m_surface);
 	if (m_palette) {
 		m_palette->Release();
 	}
@@ -56,18 +59,18 @@ HRESULT DirectDrawSurfaceImpl::Blt(
 	SDL_Surface* blitSource = other->m_surface;
 
 	if (other->m_surface->format != m_surface->format) {
-		blitSource = SDL_ConvertSurface(other->m_surface, m_surface->format);
+		blitSource = SDL_ConvertSurface(other->m_surface, m_surface->format, 0);
 		if (!blitSource) {
 			return DDERR_GENERIC;
 		}
 	}
 
-	if (!SDL_BlitSurfaceScaled(blitSource, &srcRect, m_surface, &dstRect, SDL_SCALEMODE_NEAREST)) {
+	if (!SDL_BlitScaled(blitSource, &srcRect, m_surface, &dstRect)) {
 		return DDERR_GENERIC;
 	}
 
 	if (blitSource != other->m_surface) {
-		SDL_DestroySurface(blitSource);
+		SDL_FreeSurface(blitSource);
 	}
 	return DD_OK;
 }
@@ -121,11 +124,11 @@ HRESULT DirectDrawSurfaceImpl::GetPixelFormat(LPDDPIXELFORMAT lpDDPixelFormat)
 {
 	memset(lpDDPixelFormat, 0, sizeof(*lpDDPixelFormat));
 	lpDDPixelFormat->dwFlags = DDPF_RGB;
-	const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(m_surface->format);
-	if (details->bits_per_pixel == 8) {
+	const SDL_PixelFormat* details = m_surface->format;
+	if (details->BitsPerPixel == 8) {
 		lpDDPixelFormat->dwFlags |= DDPF_PALETTEINDEXED8;
 	}
-	lpDDPixelFormat->dwRGBBitCount = details->bits_per_pixel;
+	lpDDPixelFormat->dwRGBBitCount = details->BitsPerPixel;
 	lpDDPixelFormat->dwRBitMask = details->Rmask;
 	lpDDPixelFormat->dwGBitMask = details->Gmask;
 	lpDDPixelFormat->dwBBitMask = details->Bmask;
@@ -190,7 +193,7 @@ HRESULT DirectDrawSurfaceImpl::SetColorKey(DDColorKeyFlags dwFlags, LPDDCOLORKEY
 		MINIWIN_NOT_IMPLEMENTED();
 	}
 
-	if (SDL_SetSurfaceColorKey(m_surface, true, lpDDColorKey->dwColorSpaceLowValue) != 0) {
+	if (SDL_SetColorKey(m_surface, SDL_TRUE, lpDDColorKey->dwColorSpaceLowValue) != 0) {
 		return DDERR_GENERIC;
 	}
 
@@ -199,9 +202,9 @@ HRESULT DirectDrawSurfaceImpl::SetColorKey(DDColorKeyFlags dwFlags, LPDDCOLORKEY
 
 HRESULT DirectDrawSurfaceImpl::SetPalette(LPDIRECTDRAWPALETTE lpDDPalette)
 {
-	if (m_surface->format != SDL_PIXELFORMAT_INDEX8) {
-		MINIWIN_NOT_IMPLEMENTED();
-	}
+	//if (m_surface->format != SDL_PIXELFORMAT_INDEX8) {
+	//	MINIWIN_NOT_IMPLEMENTED();
+	//}
 
 	if (m_palette) {
 		m_palette->Release();

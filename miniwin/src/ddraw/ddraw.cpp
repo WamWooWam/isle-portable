@@ -7,7 +7,9 @@
 #ifdef _WIN32
 #include "d3drmrenderer_directx9.h"
 #endif
+#ifdef USE_SDL3GPU
 #include "d3drmrenderer_sdl3gpu.h"
+#endif
 #include "d3drmrenderer_software.h"
 #include "ddpalette_impl.h"
 #include "ddraw_impl.h"
@@ -16,7 +18,7 @@
 #include "miniwin.h"
 #include "miniwin/d3d.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <assert.h>
 #include <cstdint>
 #include <cstdlib>
@@ -96,7 +98,7 @@ HRESULT DirectDrawImpl::CreateSurface(
 		}
 	}
 
-	SDL_PixelFormat format;
+	int format;
 #ifdef MINIWIN_PIXELFORMAT
 	format = MINIWIN_PIXELFORMAT;
 #else
@@ -135,40 +137,46 @@ HRESULT DirectDrawImpl::EnumDisplayModes(
 	LPDDENUMMODESCALLBACK lpEnumModesCallback
 )
 {
-	SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
-	if (!displayID) {
-		return DDERR_GENERIC;
-	}
+	//SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
+	//if (!displayID) {
+	//	return DDERR_GENERIC;
+	//}
 
-	int count_modes;
-	SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(displayID, &count_modes);
-	if (!modes) {
-		return DDERR_GENERIC;
-	}
+	int displayID = 0;
+	int count_modes = SDL_GetNumDisplayModes(displayID);
+	
+	//SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(displayID, &count_modes);
+	//if (!modes) {
+	//	return DDERR_GENERIC;
+	//}
 
-	SDL_PixelFormat format;
+	int format;
 	HRESULT status = S_OK;
 
 	for (int i = 0; i < count_modes; i++) {
+		SDL_DisplayMode mode;
+		if (SDL_GetDisplayMode(0, i, &mode) != 0)
+			continue;
+		
 #ifdef MINIWIN_PIXELFORMAT
 		format = MINIWIN_PIXELFORMAT;
 #else
-		format = modes[i]->format;
+		format = mode.format;
 #endif
 
-		const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(format);
+		SDL_PixelFormat* details = SDL_AllocFormat(format);
 		if (!details) {
 			continue;
 		}
 		DDSURFACEDESC ddsd = {};
 		ddsd.dwSize = sizeof(DDSURFACEDESC);
 		ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT;
-		ddsd.dwWidth = modes[i]->w;
-		ddsd.dwHeight = modes[i]->h;
+		ddsd.dwWidth = mode.w;
+		ddsd.dwHeight = mode.h;
 		ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 		ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB;
-		ddsd.ddpfPixelFormat.dwRGBBitCount = details->bits_per_pixel;
-		if (details->bits_per_pixel == 8) {
+		ddsd.ddpfPixelFormat.dwRGBBitCount = details->BitsPerPixel;
+		if (details->BitsPerPixel == 8) {
 			ddsd.ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
 		}
 		ddsd.ddpfPixelFormat.dwRBitMask = details->Rmask;
@@ -179,8 +187,10 @@ HRESULT DirectDrawImpl::EnumDisplayModes(
 		if (!lpEnumModesCallback(&ddsd, lpContext)) {
 			status = DDERR_GENERIC;
 		}
+		
+		SDL_FreeFormat(details);
 	}
-	SDL_free(modes);
+	// SDL_free(modes);
 
 	return status;
 }
@@ -222,7 +232,9 @@ void EnumDevice(LPD3DENUMDEVICESCALLBACK cb, void* ctx, Direct3DRMRenderer* devi
 
 HRESULT DirectDrawImpl::EnumDevices(LPD3DENUMDEVICESCALLBACK cb, void* ctx)
 {
+#ifdef USE_SDL3GPU
 	Direct3DRMSDL3GPU_EnumDevice(cb, ctx);
+#endif
 #ifdef USE_OPENGLES2
 	OpenGLES2Renderer_EnumDevice(cb, ctx);
 #endif
@@ -239,31 +251,37 @@ HRESULT DirectDrawImpl::EnumDevices(LPD3DENUMDEVICESCALLBACK cb, void* ctx)
 
 HRESULT DirectDrawImpl::GetDisplayMode(LPDDSURFACEDESC lpDDSurfaceDesc)
 {
-	SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
-	if (!displayID) {
+	//SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
+	//if (!displayID) {
+	//	return DDERR_GENERIC;
+	//}
+	
+	int displayID = 0;
+	//const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(displayID);
+	//if (!mode) {
+	//	return DDERR_GENERIC;
+	//}
+	
+	SDL_DisplayMode mode;
+	if (SDL_GetCurrentDisplayMode(displayID, &mode) != 0) {
 		return DDERR_GENERIC;
 	}
 
-	const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(displayID);
-	if (!mode) {
-		return DDERR_GENERIC;
-	}
-
-	SDL_PixelFormat format;
+	int format;
 #ifdef MINIWIN_PIXELFORMAT
 	format = MINIWIN_PIXELFORMAT;
 #else
-	format = mode->format;
+	format = mode.format;
 #endif
 
-	const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(format);
+	SDL_PixelFormat* details = SDL_AllocFormat(format);
 
 	lpDDSurfaceDesc->dwFlags = DDSD_WIDTH | DDSD_HEIGHT;
-	lpDDSurfaceDesc->dwWidth = mode->w;
-	lpDDSurfaceDesc->dwHeight = mode->h;
-	lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = details->bits_per_pixel;
+	lpDDSurfaceDesc->dwWidth = mode.w;
+	lpDDSurfaceDesc->dwHeight = mode.h;
+	lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = details->BitsPerPixel;
 	lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB;
-	if (details->bits_per_pixel == 8) {
+	if (details->BitsPerPixel == 8) {
 		lpDDSurfaceDesc->ddpfPixelFormat.dwFlags |= DDPF_PALETTEINDEXED8;
 	}
 	lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = details->Rmask;
@@ -271,6 +289,8 @@ HRESULT DirectDrawImpl::GetDisplayMode(LPDDSURFACEDESC lpDDSurfaceDesc)
 	lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = details->Bmask;
 	lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = details->Amask;
 
+	SDL_FreeFormat(details);
+	
 	return DD_OK;
 }
 
@@ -302,9 +322,9 @@ HRESULT DirectDrawImpl::SetCooperativeLevel(HWND hWnd, DDSCLFlags dwFlags)
 #endif
 		}
 		DDWindow = sdlWindow;
-		DDRenderer = SDL_CreateRenderer(DDWindow, NULL);
-		SDL_PropertiesID prop = SDL_GetRendererProperties(DDRenderer);
-		SDL_SetRenderLogicalPresentation(DDRenderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+		DDRenderer = SDL_CreateRenderer(DDWindow, -1, SDL_RENDERER_ACCELERATED);
+		// SDL_PropertiesID prop = SDL_GetRendererProperties(DDRenderer);
+		// SDL_SetRenderLogicalPresentation(DDRenderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 	}
 	return DD_OK;
 }
@@ -325,29 +345,32 @@ HRESULT DirectDrawImpl::CreateDevice(
 	DDSDesc.dwSize = sizeof(DDSURFACEDESC);
 	pBackBuffer->GetSurfaceDesc(&DDSDesc);
 
-	Direct3DRMRenderer* renderer;
+	Direct3DRMRenderer* renderer = nullptr;
+#ifdef USE_SDL3GPU
 	if (SDL_memcmp(&guid, &SDL3_GPU_GUID, sizeof(GUID)) == 0) {
 		renderer = Direct3DRMSDL3GPURenderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
+#endif
 #ifdef USE_OPENGLES2
-	else if (SDL_memcmp(&guid, &OpenGLES2_GUID, sizeof(GUID)) == 0) {
+	 if (SDL_memcmp(&guid, &OpenGLES2_GUID, sizeof(GUID)) == 0) {
 		renderer = OpenGLES2Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
 #ifdef USE_OPENGL1
-	else if (SDL_memcmp(&guid, &OpenGL1_GUID, sizeof(GUID)) == 0) {
+	 if (SDL_memcmp(&guid, &OpenGL1_GUID, sizeof(GUID)) == 0) {
 		renderer = OpenGL1Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
 #ifdef _WIN32
-	else if (SDL_memcmp(&guid, &DirectX9_GUID, sizeof(GUID)) == 0) {
+	 if (SDL_memcmp(&guid, &DirectX9_GUID, sizeof(GUID)) == 0) {
 		renderer = DirectX9Renderer::Create(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
 #endif
-	else if (SDL_memcmp(&guid, &SOFTWARE_GUID, sizeof(GUID)) == 0) {
+	 if (SDL_memcmp(&guid, &SOFTWARE_GUID, sizeof(GUID)) == 0) {
 		renderer = new Direct3DRMSoftwareRenderer(DDSDesc.dwWidth, DDSDesc.dwHeight);
 	}
-	else {
+	
+	if(renderer == nullptr) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Device GUID not recognized");
 		return E_NOINTERFACE;
 	}

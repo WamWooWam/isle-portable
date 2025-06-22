@@ -6,7 +6,7 @@
 #include "miniwin/miniwindevice.h"
 #include "structs.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 #define NO_TEXTURE_ID 0xffffffff
 
@@ -51,6 +51,7 @@ public:
 
 	bool ConvertEventToRenderCoordinates(SDL_Event* event)
 	{
-		return SDL_ConvertEventToRenderCoordinates(DDRenderer, event);
+		// return SDL_ConvertEventToRenderCoordinates(DDRenderer, event);
+		return true; // BUGBUG: this is bad
 	}
 };

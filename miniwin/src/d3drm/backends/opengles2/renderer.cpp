@@ -3,7 +3,7 @@
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <string>
 

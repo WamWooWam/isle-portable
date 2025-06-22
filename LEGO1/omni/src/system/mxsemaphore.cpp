@@ -28,12 +28,12 @@ MxResult MxSemaphore::Init(MxU32 p_initialCount, MxU32 p_maxCount)
 void MxSemaphore::Wait()
 {
 	// [library:synchronization] Removed timeout since only INFINITE is ever requested
-	SDL_WaitSemaphore(m_semaphore);
+	SDL_SemWait(m_semaphore);
 }
 
 // FUNCTION: LEGO1 0x100c8850
 void MxSemaphore::Release()
 {
 	// [library:synchronization] Removed release count since only 1 is ever requested
-	SDL_SignalSemaphore(m_semaphore);
+	SDL_SemPost(m_semaphore);
 }

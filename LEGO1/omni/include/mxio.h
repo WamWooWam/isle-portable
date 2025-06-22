@@ -3,7 +3,7 @@
 
 #include "mxtypes.h"
 
-#include <SDL3/SDL_iostream.h>
+// #include <SDL2/SDL_iostream.h>
 
 // [library:filesystem]
 // We define the bare minimum constants and structures to be compatible with the code in mxio.cpp
