@@ -48,6 +48,15 @@ add_library(libsmacker STATIC
 )
 target_include_directories(libsmacker PUBLIC ${libsmacker_SOURCE_DIR})
 
+if(INBOX_SDL2) 
+
+add_library(SDL2 INTERFACE)
+target_include_directories(SDL2 INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/sdl2_ppc/include")
+target_link_libraries(SDL2 INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/sdl2_ppc/lib/libSDL2-2.0.0.dylib")
+
+endif()
+
 if(DOWNLOAD_DEPENDENCIES)
     include(FetchContent)
     FetchContent_Declare(
@@ -59,6 +68,7 @@ if(DOWNLOAD_DEPENDENCIES)
 else()
     set(imgui_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 endif()
+
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -77,6 +87,7 @@ set(sdl3_backport_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdl3_backport")
 
 add_library(sdl3_backport STATIC
     ${sdl3_backport_SOURCE_DIR}/SDL_iostream.c
+    ${sdl3_backport_SOURCE_DIR}/SDL_rand.cpp
 )
 target_include_directories(sdl3_backport PUBLIC ${sdl3_backport_SOURCE_DIR})
 target_link_libraries(sdl3_backport PUBLIC SDL2)

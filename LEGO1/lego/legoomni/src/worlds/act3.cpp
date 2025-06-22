@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <vec.h>
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Act3, 0x4274)
 DECOMP_SIZE_ASSERT(Act3State, 0x0c)
 DECOMP_SIZE_ASSERT(Act3ListElement, 0x0c)

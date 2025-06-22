@@ -21,6 +21,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Act3Actor, 0x178)
 DECOMP_SIZE_ASSERT(Act3Cop, 0x188)
 DECOMP_SIZE_ASSERT(Act3Cop::Act3CopDest, 0x20)

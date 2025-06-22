@@ -1,6 +1,7 @@
 #include "legostate.h"
 
 #include <stdlib.h>
+#include <SDL3/SDL_rand.h>
 
 DECOMP_SIZE_ASSERT(LegoState, 0x08)
 DECOMP_SIZE_ASSERT(LegoState::Playlist, 0x0c)

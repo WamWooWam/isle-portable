@@ -38,6 +38,8 @@
 #include "towtrack.h"
 #include "viewmanager/viewmanager.h"
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Act1State, 0x26c)
 DECOMP_SIZE_ASSERT(LegoNamedPlane, 0x4c)
 DECOMP_SIZE_ASSERT(Isle, 0x140)

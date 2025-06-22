@@ -13,6 +13,7 @@
 #include "mxvideopresenter.h"
 
 #include <SDL2/SDL_timer.h>
+#include <SDL3/SDL_rand.h>
 
 DECOMP_SIZE_ASSERT(MxTransitionManager, 0x900)
 

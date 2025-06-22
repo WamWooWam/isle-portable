@@ -14,6 +14,8 @@
 #include "mxtimer.h"
 #include "scripts.h"
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Radio, 0x10)
 DECOMP_SIZE_ASSERT(RadioState, 0x30)
 

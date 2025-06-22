@@ -24,6 +24,7 @@
 #include "scripts.h"
 
 #include <SDL2/SDL_stdinc.h>
+#include <SDL3/SDL_rand.h>
 #include <stdio.h>
 
 DECOMP_SIZE_ASSERT(Ambulance, 0x184)

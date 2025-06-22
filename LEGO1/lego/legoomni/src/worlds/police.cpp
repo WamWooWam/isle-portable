@@ -15,6 +15,8 @@
 #include "police_actions.h"
 #include "scripts.h"
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Police, 0x110)
 DECOMP_SIZE_ASSERT(PoliceState, 0x10)
 

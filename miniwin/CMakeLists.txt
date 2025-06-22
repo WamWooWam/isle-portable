@@ -162,5 +162,5 @@ if(ISLE_COMPILE_SHADERS)
       "--shader-stages" ${shader_stages}
       "--shader-jsons" ${shader_jsons}
     DEPENDS "${py_gencshadersource}" ${shader_headers} ${shader_jsons})
+  target_sources(miniwin PRIVATE "${index}" "${index_cpp}")
 endif()
-target_sources(miniwin PRIVATE "${index}" "${index_cpp}")

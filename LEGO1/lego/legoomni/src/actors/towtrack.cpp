@@ -22,6 +22,8 @@
 
 #include <stdio.h>
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(TowTrack, 0x180)
 DECOMP_SIZE_ASSERT(TowTrackMissionState, 0x28)
 

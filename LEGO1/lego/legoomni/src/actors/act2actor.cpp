@@ -20,6 +20,8 @@
 
 #include <vec.h>
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(Act2Actor, 0x1a8)
 DECOMP_SIZE_ASSERT(Act2Actor::Location, 0x20)
 

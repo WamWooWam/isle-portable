@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 
+#include <SDL3/SDL_rand.h>
+
 DECOMP_SIZE_ASSERT(CarRace, 0x154)
 
 // GLOBAL: LEGO1 0x100d5d10

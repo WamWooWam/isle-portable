@@ -32,14 +32,15 @@ option(ISLE_BUILD_APP "Build isle application" ON)
 option(ISLE_ASAN "Enable Address Sanitizer" OFF)
 option(ISLE_UBSAN "Enable Undefined Behavior Sanitizer" OFF)
 option(ISLE_WERROR "Treat warnings as errors" OFF)
-option(ISLE_DEBUG "Enable imgui debug" ON)
+option(ISLE_DEBUG "Enable imgui debug" OFF)
 cmake_dependent_option(ISLE_USE_DX5 "Build with internal DirectX 5 SDK" "${NOT_MINGW}" "WIN32;CMAKE_SIZEOF_VOID_P EQUAL 4" OFF)
 cmake_dependent_option(ISLE_MINIWIN "Use miniwin" ON "NOT ISLE_USE_DX5" OFF)
-cmake_dependent_option(ISLE_BUILD_CONFIG "Build CONFIG.EXE application" ON "MSVC OR ISLE_MINIWIN" OFF)
+cmake_dependent_option(ISLE_BUILD_CONFIG "Build CONFIG.EXE application" OFF "MSVC OR ISLE_MINIWIN" OFF)
 cmake_dependent_option(ISLE_COMPILE_SHADERS "Compile shaders" ON "SDL_SHADERCROSS_BIN;TARGET Python3::Interpreter" OFF)
 option(CMAKE_POSITION_INDEPENDENT_CODE "Build with -fPIC" ON)
 option(ENABLE_CLANG_TIDY "Enable clang-tidy")
-option(DOWNLOAD_DEPENDENCIES "Download dependencies" ON)
+option(DOWNLOAD_DEPENDENCIES "Download dependencies" OF)
+option(INBOX_SDL2 "Use supplied SDL2 library for Mac OS X" ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" CACHE PATH "Directory where to put executables and dll")
 set(ISLE_EMSCRIPTEN_HOST "" CACHE STRING "Host URL for Emscripten streaming (e.g., https://test.com)")
 cmake_dependent_option(BUILD_SHARED_LIBS "Build lego1 as a shared library" ON "NOT EMSCRIPTEN" OFF)
@@ -66,13 +67,11 @@ else()
     # find_package looks for already-installed system packages.
     # Configure with `-DCMAKE_PREFIX_PATH="/path/to/package1;/path/to/package2"`
     # to add search paths.
-    # find_package(SDL2 CONFIG REQUIRED)
 
-    add_library(SDL2 INTERFACE)
-    target_include_directories(SDL2 INTERFACE
-	/usr/local/include
-    )
-	
+    if(!INBOX_SDL2)
+    find_package(SDL2 CONFIG REQUIRED)
+    endif()
+    
     FetchContent_Declare(
         iniparser
         GIT_REPOSITORY "https://gitlab.com/iniparser/iniparser.git"
@@ -84,6 +83,7 @@ else()
       set(BUILD_SHARED_LIBS off)
       FetchContent_MakeAvailable(iniparser)
     endblock()
+    
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -154,7 +154,7 @@ target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/L
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include>")
 target_include_directories(lego1 PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LEGO1/lego/legoomni/include/actions>")
 target_link_libraries(lego1 PUBLIC SDL2)
-target_link_libraries(lego1 PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5> atomic /Users/thomasmay/Projects/SDL2-2.0.8/build/.libs/libSDL2-2.0.0.dylib)
+target_link_libraries(lego1 PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5> atomic)
 if(WIN32)
   set_property(TARGET lego1 PROPERTY PREFIX "")
 endif()
@@ -484,7 +484,7 @@ if (ISLE_BUILD_APP)
   target_link_libraries(isle PRIVATE $<$<BOOL:${ISLE_USE_DX5}>:DirectX5::DirectX5>)
 
   # Link SDL and iniparser
-  target_link_libraries(isle PRIVATE SDL2 iniparser-static sdl3_backport atomic /Users/thomasmay/Projects/SDL2-2.0.8/build/.libs/libSDL2-2.0.0.dylib)
+  target_link_libraries(isle PRIVATE SDL2 iniparser-static sdl3_backport atomic)
 
   # Allow unconditional include of miniwin/miniwindevice.h
   target_link_libraries(isle PRIVATE miniwin-headers)

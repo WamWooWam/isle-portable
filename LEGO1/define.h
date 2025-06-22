@@ -40,6 +40,4 @@ extern const char* g_strPATH;
 extern const char* g_strCOLLIDEBOX;
 extern const char* g_strHIT_ACTOR_SOUND;
 
-#define SDL_rand(x) (rand() % x)
-
 #endif // DEFINE_H
